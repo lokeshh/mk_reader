@@ -11,8 +11,8 @@ const DEFAULT_VERSE = [
 const INITIAL_STATE = {
   maxChapters: 0,
   maxVerses: 0,
-  currentBook: 0,
-  currentChapter: 0,
+  currentBook: 1,
+  currentChapter: 1,
   currentVerse: 0,
   loadingVerseCount: false,
   displayVerse: DEFAULT_VERSE,

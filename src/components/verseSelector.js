@@ -10,13 +10,13 @@ import InputLabel from '@material-ui/core/InputLabel';
 class VerseSelector extends Component {
   componentDidMount() {
     if (this.props.location.pathname === '/') {
-      this.props.history.push(`/1/1/1`)
+      this.props.history.push(`/1/1`)
+      window.location.reload()
     }
     var x = this.props.location.pathname.split('/');
 
     this.props.changeBook(x[1])
     this.props.changeChapter(x[1], x[2])
-    this.props.changeVerse(x[1], x[2], x[3])
   }
 
   selectBook(e) {
@@ -24,7 +24,7 @@ class VerseSelector extends Component {
     this.props.changeBook(book);
     this.props.changeChapter(book, 1)
     this.props.changeVerse(book, 1, 1)
-    this.props.history.push(`/${book}/1/1`)
+    this.props.history.push(`/${book}/1`)
   }
 
   selectChapter(e) {
@@ -32,7 +32,7 @@ class VerseSelector extends Component {
     const book = this.props.verseReducer.currentBook
     this.props.changeChapter(book, chapter)
     this.props.changeVerse(book, chapter, 1)
-    this.props.history.push(`/${book}/${chapter}/1`)
+    this.props.history.push(`/${book}/${chapter}`)
   }
 
   selectVerse(e) {
