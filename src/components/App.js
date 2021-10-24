@@ -4,32 +4,10 @@ import OmLogo from './OM.png';
 import {
   Container, Row, Col
 } from 'reactstrap';
-
-
-
-
-// function App() {
-//   return (
-//     <div className="App">
-//       <header className="App-header">
-//         <img src={logo} className="App-logo" alt="logo" />
-//         <p>
-//           Edit <code>src/App.js</code> and save to reload.
-//         </p>
-//         <a
-//           className="App-link"
-//           href="https://reactjs.org"
-//           target="_blank"
-//           rel="noopener noreferrer"
-//         >
-//           Learn React
-//         </a>
-//       </header>
-//     </div>
-//   );
-// }
-
-// export default App;
+import VerseSelector from './verseSelector';
+import VerseDisplay from './verseDisplay';
+import CommDisplay from './commDisplay';
+import CommAbsDisplay from './commAbsDisplay';
 
 export default class App extends Component {
 
@@ -45,18 +23,25 @@ export default class App extends Component {
           <br />
           <Row>
             <Col>
-              <h3>Mokshopaya</h3>
+              <h3>मोक्षोपायः</h3>
             </Col>
           </Row>
 
-          {/* <br />
+          <br />
 
           <VerseSelector />
 
           <hr />
 
-          <VerseDisplay /> */}
+          <VerseDisplay />
 
+          {/* <br />
+
+          <CommAbsDisplay />
+
+          <br />
+
+          <CommDisplay /> */}
         </Container>
 
       </div>
