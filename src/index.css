@@ -5,10 +5,17 @@
   font-style: normal;
 }
 
+@font-face {
+  font-family: 'Siddhanta';
+  src: url('./assets/fonts/siddhanta1.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
 body {
   margin: 0;
   padding: 0;
-  /* font-family: 'Santipur2014', sans-serif; */
-  font-family: "Tiro Devanagari Sanskrit", serif;
+  font-family: 'Siddhanta', sans-serif;
+  /* font-family: "Tiro Devanagari Sanskrit", serif; */
 }
 
