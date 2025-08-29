@@ -1,5 +1,14 @@
+@font-face {
+  font-family: 'Santipur2014';
+  src: url('./assets/fonts/Santipur2014.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
 body {
   margin: 0;
   padding: 0;
-  font-family: sans-serif;
+  /* font-family: 'Santipur2014', sans-serif; */
+  font-family: "Tiro Devanagari Sanskrit", serif;
 }
+

@@ -12,6 +12,9 @@ import thunk from 'redux-thunk';
 import registerServiceWorker from './registerServiceWorker';
 import 'bootstrap/dist/css/bootstrap.css';
 import './index.css';
+import "@fontsource/tiro-devanagari-sanskrit";             // Default weight (400)
+import "@fontsource/tiro-devanagari-sanskrit/400.css";     // Explicit weight
+// Use additional files like `400-italic.css` if needed
 
 const createStoreWithMiddleware = applyMiddleware(thunk)(createStore);
 
