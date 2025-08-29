@@ -43,7 +43,7 @@ class VerseDisplay extends Component {
                     var new_verse = ["\n"]
                     new_verse = new_verse.concat(verse)
                     var last_line = new_verse.pop()
-                    last_line = last_line + index.toString() + "॥"
+                    last_line = last_line + toDevanagari(index.toString()) + "॥"
                     new_verse = new_verse.concat([last_line])
                     return Object.values(new_verse).map(line => {
                       return <div>{ line }<br /></div>
@@ -69,3 +69,22 @@ export default compose(
     changeVerse
   })
 )(VerseDisplay);
+
+function toDevanagari(num) {
+  const englishToDevanagari = {
+    "0": "०",
+    "1": "१",
+    "2": "२",
+    "3": "३",
+    "4": "४",
+    "5": "५",
+    "6": "६",
+    "7": "७",
+    "8": "८",
+    "9": "९",
+  };
+
+  return String(num).split("").map(char =>
+    englishToDevanagari[char] || char // keep non-digits as is
+  ).join("");
+}
