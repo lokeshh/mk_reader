@@ -25,7 +25,7 @@ export default function(state = INITIAL_STATE, action) {
     case FETCH_VERSE_COUNT:
       return {...state, loadingVerseCount: true}
     case VERSE_COUNT_SUCCESS:
-      return {...state, loadingVerseCount: false, maxVerses: action.payload.val()}
+      return {...state, loadingVerseCount: false, maxVerses: action.payload}
     case CHAPTER_COUNT_SUCCESS:
       return {...state, maxChapters: action.payload}
     case CHANGE_BOOK:
@@ -35,18 +35,18 @@ export default function(state = INITIAL_STATE, action) {
     case CHANGE_VERSE:
       return {...state, currentVerse: action.payload}
     case VERSE_TEXT_SUCCESS:
-      if (action.payload.val() != null) {
-        return {...state, displayVerse: action.payload.val()}
+      if (action.payload != null) {
+        return {...state, displayVerse: action.payload}
       }
       return state
     case COMM_TEXT_SUCCESS:
-      if (action.payload.val() != null) {
-        return {...state, displayComm: action.payload.val()}
+      if (action.payload != null) {
+        return {...state, displayComm: action.payload}
       }
       return state
     case COMM_ABS_TEXT_SUCCESS:
-      if (action.payload.val() != null) {
-        return {...state, displayCommAbs: action.payload.val()}
+      if (action.payload != null) {
+        return {...state, displayCommAbs: action.payload}
       }
       return state
     case RESET_TEXT:

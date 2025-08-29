@@ -1,6 +1,5 @@
-import * as firebase from "firebase/app";
-import 'firebase/database';
-import 'firebase/analytics';
+import { initializeApp } from 'firebase/app';
+import { getDatabase, ref, get } from 'firebase/database';
 
 export const FETCH_VERSE_COUNT = 'FETCH_VERSE_COUNT';
 export const VERSE_COUNT_SUCCESS = 'VERSE_COUNT_SUCCESS';
@@ -14,7 +13,7 @@ export const COMM_ABS_TEXT_SUCCESS = 'COMM_ABS_TEXT_SUCCESS';
 export const RESET_TEXT = 'RESET_TEXT';
 
 
-var firebaseConfig = {
+const firebaseConfig = {
   apiKey: "AIzaSyA82zcPEsxhD4dAnJ6c_QotN8n7hqrPsEw",
   authDomain: "yv-api-5737d.firebaseapp.com",
   databaseURL: "https://yv-api-5737d.firebaseio.com",
@@ -25,54 +24,54 @@ var firebaseConfig = {
   measurementId: "G-55VK3ZZZ20"
 };
 
-firebase.initializeApp(firebaseConfig)
-firebase.analytics()
-firebase.analytics().logEvent('session active')
+const app = initializeApp(firebaseConfig);
+const database = getDatabase(app);
 
 export function changeChapter(book, chapter) {
   return dispatch => {
     dispatch({ type: FETCH_VERSE_COUNT });
-    dispatch({ type: CHANGE_CHAPTER, payload: chapter })
+    dispatch({ type: CHANGE_CHAPTER, payload: chapter });
 
-    const location = `${book}/${chapter}`
-    var yv_core_ref = firebase.database().ref(`yv/count/${location}`)
-    console.log(firebase.database().ref(`yv/count/${location}`))
-    var yv_core_ref = firebase.database().ref(`yv/mk_core/${location}`)
-    yv_core_ref.once('value')
-      .then(response => {
-        dispatch({ type: VERSE_TEXT_SUCCESS, payload: response })
-      }
-    )
-  }
+    const location = `${book}/${chapter}`;
+
+    // Fetch verse count (if needed)
+    const countRef = ref(database, `yv/count/${location}`);
+    get(countRef).then(snapshot => {
+      dispatch({ type: VERSE_COUNT_SUCCESS, payload: snapshot.val() });
+    });
+
+    // Fetch verse text
+    const coreRef = ref(database, `yv/mk_core/${location}`);
+    get(coreRef).then(snapshot => {
+      dispatch({ type: VERSE_TEXT_SUCCESS, payload: snapshot.val() });
+    });
+  };
 }
 
 export function changeVerse(book, chapter, verse) {
   return dispatch => {
-    dispatch({ type: CHANGE_VERSE, payload: verse })
+    dispatch({ type: CHANGE_VERSE, payload: verse });
 
-    const location = `${book}/${chapter}`
+    const location = `${book}/${chapter}`;
 
-    var yv_core_ref = firebase.database().ref(`yv/mk_core/${location}`)
-    yv_core_ref.once('value')
-      .then(response => {
-        dispatch({ type: VERSE_TEXT_SUCCESS, payload: response })
-      }
-    )
+    // Fetch verse text
+    const coreRef = ref(database, `yv/mk_core/${location}`);
+    get(coreRef).then(snapshot => {
+      dispatch({ type: VERSE_TEXT_SUCCESS, payload: snapshot.val() });
+    });
 
-    var vlm_ref = firebase.database().ref(`yv/vlm/${location}`)
-    vlm_ref.once('value')
-      .then(response => {
-        dispatch({ type: COMM_TEXT_SUCCESS, payload: response })
-      }
-    )
+    // Fetch commentary text
+    const vlmRef = ref(database, `yv/vlm/${location}`);
+    get(vlmRef).then(snapshot => {
+      dispatch({ type: COMM_TEXT_SUCCESS, payload: snapshot.val() });
+    });
 
-    var abs_ref = firebase.database().ref(`yv/abs/${location}`)
-    abs_ref.once('value')
-      .then(response => {
-        dispatch({ type: COMM_ABS_TEXT_SUCCESS, payload: response })
-      }
-    )
-  }
+    // Fetch abstract commentary text
+    const absRef = ref(database, `yv/abs/${location}`);
+    get(absRef).then(snapshot => {
+      dispatch({ type: COMM_ABS_TEXT_SUCCESS, payload: snapshot.val() });
+    });
+  };
 }
 
 export function changeBook(book) {
@@ -83,13 +82,13 @@ export function changeBook(book) {
     4: 44,
     5: 94,
     6: 253
-  }
+  };
 
   return dispatch => {
-    dispatch({ type: CHANGE_BOOK, payload: book })
+    dispatch({ type: CHANGE_BOOK, payload: book });
     dispatch({
       type: CHAPTER_COUNT_SUCCESS,
       payload: mapping[book]
-    })
-  }
+    });
+  };
 }
