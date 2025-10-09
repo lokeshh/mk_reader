@@ -51,8 +51,8 @@ class VerseSelector extends Component {
     return (
       <Row style={{ justifyContent: 'center', alignItems: 'center' }}>
         <Col xs={12} md={6} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-          <InputLabel id="book-label" style={{ marginBottom: '8px', fontWeight: 'bold', fontSize: '18px', fontFamily: 'Shobhika-Regular, Shobhika, serif' }}>प्रकरणम्</InputLabel>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%' }}>
+            <InputLabel id="book-label" style={{ marginRight: '12px', fontWeight: 'bold', fontSize: '18px', fontFamily: 'Shobhika-Regular, Shobhika, serif' }}>प्रकरणम्</InputLabel>
             <button
               style={{ marginRight: '8px', background: '#f0f0f0', border: 'none', borderRadius: '50%', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px', cursor: 'pointer' }}
               disabled={Number(currentBook) <= 1}
@@ -92,8 +92,8 @@ class VerseSelector extends Component {
           </div>
         </Col>
         <Col xs={12} md={6} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-          <InputLabel id="chapter-label" style={{ marginBottom: '8px', fontWeight: 'bold', fontSize: '18px', fontFamily: 'Shobhika-Regular, Shobhika, serif' }}>सर्गः</InputLabel>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%' }}>
+            <InputLabel id="chapter-label" style={{ marginRight: '12px', fontWeight: 'bold', fontSize: '18px', fontFamily: 'Shobhika-Regular, Shobhika, serif' }}>सर्गः</InputLabel>
             <button
               style={{ marginRight: '8px', background: '#f0f0f0', border: 'none', borderRadius: '50%', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px', cursor: 'pointer' }}
               disabled={currentChapter <= 1}
