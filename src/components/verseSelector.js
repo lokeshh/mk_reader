@@ -50,7 +50,7 @@ class VerseSelector extends Component {
   currentChapter = Number(currentChapter);
     return (
       <Row style={{ justifyContent: 'center', alignItems: 'center' }}>
-        <Col xs={12} md={6} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        <Col xs={12} md={6} className="selector-col" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%' }}>
             <InputLabel id="book-label" style={{ marginRight: '12px', fontWeight: 'bold', fontSize: '18px', fontFamily: 'Shobhika-Regular, Shobhika, serif' }}>प्रकरणम्</InputLabel>
             <button
@@ -91,7 +91,7 @@ class VerseSelector extends Component {
             </button>
           </div>
         </Col>
-        <Col xs={12} md={6} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        <Col xs={12} md={6} className="selector-col" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%' }}>
             <InputLabel id="chapter-label" style={{ marginRight: '12px', fontWeight: 'bold', fontSize: '18px', fontFamily: 'Shobhika-Regular, Shobhika, serif' }}>सर्गः</InputLabel>
             <button

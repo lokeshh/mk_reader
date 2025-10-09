@@ -29,3 +29,10 @@ body {
 h5 {
   line-height: 1.5;
 }
+
+/* Add comfortable spacing between stacked selector columns on small screens */
+@media (max-width: 768px) {
+  .selector-col {
+    margin-bottom: 16px;
+  }
+}
