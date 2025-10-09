@@ -49,93 +49,88 @@ class VerseSelector extends Component {
   let { currentChapter, currentBook } = this.props.verseReducer;
   currentChapter = Number(currentChapter);
     return (
-      <Row>
-        <Col>
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
-            <div style={{ display: 'flex', alignItems: 'center', width: '100%' }}>
-              <InputLabel id="demo-simple-select-label" style={{ marginRight: '12px', minWidth: '48px' }}>प्रकरणम्</InputLabel>
-              <button
-                style={{ marginRight: '8px', background: '#f0f0f0', border: 'none', borderRadius: '50%', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px', cursor: 'pointer' }}
-                disabled={Number(currentBook) <= 1}
-                onClick={() => {
-                  if (Number(currentBook) > 1) {
-                    this.selectBook({ target: { value: Number(currentBook) - 1 } });
-                  }
-                }}
-                aria-label="Previous Book"
-              >
-                &#8592;
-              </button>
-              <Select
-                native
-                labelId="demo-simple-select-label"
-                id="demo-simple-select"
-                value={currentBook}
-                onChange={this.selectBook.bind(this)}
-                style={{ minWidth: '80px' }}
-              >
-                {[1, 2, 3, 4, 5, 6].map(i => (
-                  <option value={i} key={i}>{i}</option>
-                ))}
-              </Select>
-              <button
-                style={{ marginLeft: '8px', background: '#f0f0f0', border: 'none', borderRadius: '50%', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px', cursor: 'pointer' }}
-                disabled={Number(currentBook) >= 6}
-                onClick={() => {
-                  if (Number(currentBook) < 6) {
-                    this.selectBook({ target: { value: Number(currentBook) + 1 } });
-                  }
-                }}
-                aria-label="Next Book"
-              >
-                &#8594;
-              </button>
-            </div>
+      <Row style={{ justifyContent: 'center', alignItems: 'center' }}>
+        <Col xs={12} md={6} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <InputLabel id="book-label" style={{ marginBottom: '8px', fontWeight: 'bold', fontSize: '18px', fontFamily: 'Shobhika-Regular, Shobhika, serif' }}>प्रकरणम्</InputLabel>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%' }}>
+            <button
+              style={{ marginRight: '8px', background: '#f0f0f0', border: 'none', borderRadius: '50%', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px', cursor: 'pointer' }}
+              disabled={Number(currentBook) <= 1}
+              onClick={() => {
+                if (Number(currentBook) > 1) {
+                  this.selectBook({ target: { value: Number(currentBook) - 1 } });
+                }
+              }}
+              aria-label="Previous Book"
+            >
+              &#8592;
+            </button>
+            <Select
+              native
+              labelId="book-label"
+              id="book-select"
+              value={currentBook}
+              onChange={this.selectBook.bind(this)}
+              style={{ minWidth: '80px' }}
+            >
+              {[1, 2, 3, 4, 5, 6].map(i => (
+                <option value={i} key={i}>{i}</option>
+              ))}
+            </Select>
+            <button
+              style={{ marginLeft: '8px', background: '#f0f0f0', border: 'none', borderRadius: '50%', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px', cursor: 'pointer' }}
+              disabled={Number(currentBook) >= 6}
+              onClick={() => {
+                if (Number(currentBook) < 6) {
+                  this.selectBook({ target: { value: Number(currentBook) + 1 } });
+                }
+              }}
+              aria-label="Next Book"
+            >
+              &#8594;
+            </button>
           </div>
         </Col>
-
-        <Col>
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
-            <div style={{ display: 'flex', alignItems: 'center', width: '100%' }}>
-              <InputLabel id="demo-simple-select-label" style={{ marginRight: '12px', minWidth: '48px' }}>सर्गः</InputLabel>
-              <button
-                style={{ marginRight: '8px', background: '#f0f0f0', border: 'none', borderRadius: '50%', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px', cursor: 'pointer' }}
-                disabled={currentChapter <= 1}
-                onClick={() => {
-                  if (currentChapter > 1) {
-                    this.selectChapter({ target: { value: currentChapter - 1 } });
-                  }
-                }}
-                aria-label="Previous Chapter"
-              >
-                &#8592;
-              </button>
-              <Select
-                native
-                labelId="demo-simple-select-label"
-                id="demo-simple-select"
-                value={currentChapter}
-                onChange={this.selectChapter.bind(this)}
-                style={{ minWidth: '80px' }}
-              >
-                {maxChapters > 0 && [...Array(maxChapters).keys()].map(i => {
-                  i += 1;
-                  return <option value={i} key={i}>{i}</option>;
-                })}
-              </Select>
-              <button
-                style={{ marginLeft: '8px', background: '#f0f0f0', border: 'none', borderRadius: '50%', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px', cursor: 'pointer' }}
-                disabled={currentChapter >= maxChapters}
-                onClick={() => {
-                  if (currentChapter < maxChapters) {
-                    this.selectChapter({ target: { value: currentChapter + 1 } });
-                  }
-                }}
-                aria-label="Next Chapter"
-              >
-                &#8594;
-              </button>
-            </div>
+        <Col xs={12} md={6} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <InputLabel id="chapter-label" style={{ marginBottom: '8px', fontWeight: 'bold', fontSize: '18px', fontFamily: 'Shobhika-Regular, Shobhika, serif' }}>सर्गः</InputLabel>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%' }}>
+            <button
+              style={{ marginRight: '8px', background: '#f0f0f0', border: 'none', borderRadius: '50%', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px', cursor: 'pointer' }}
+              disabled={currentChapter <= 1}
+              onClick={() => {
+                if (currentChapter > 1) {
+                  this.selectChapter({ target: { value: currentChapter - 1 } });
+                }
+              }}
+              aria-label="Previous Chapter"
+            >
+              &#8592;
+            </button>
+            <Select
+              native
+              labelId="chapter-label"
+              id="chapter-select"
+              value={currentChapter}
+              onChange={this.selectChapter.bind(this)}
+              style={{ minWidth: '80px' }}
+            >
+              {maxChapters > 0 && [...Array(maxChapters).keys()].map(i => {
+                i += 1;
+                return <option value={i} key={i}>{i}</option>;
+              })}
+            </Select>
+            <button
+              style={{ marginLeft: '8px', background: '#f0f0f0', border: 'none', borderRadius: '50%', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px', cursor: 'pointer' }}
+              disabled={currentChapter >= maxChapters}
+              onClick={() => {
+                if (currentChapter < maxChapters) {
+                  this.selectChapter({ target: { value: currentChapter + 1 } });
+                }
+              }}
+              aria-label="Next Chapter"
+            >
+              &#8594;
+            </button>
           </div>
         </Col>
       </Row>
