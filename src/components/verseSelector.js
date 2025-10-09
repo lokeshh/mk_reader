@@ -51,6 +51,7 @@ class VerseSelector extends Component {
   let { currentChapter, currentBook } = this.props.verseReducer;
   currentChapter = Number(currentChapter);
     return (
+      <div>
       <Row style={{ justifyContent: 'center', alignItems: 'center' }}>
         <Col xs={12} md={6} className="selector-col" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%' }}>
@@ -136,6 +137,53 @@ class VerseSelector extends Component {
           </div>
         </Col>
       </Row>
+      {/* Font size controls */}
+      <Row style={{ justifyContent: 'center', marginTop: 12 }}>
+        <Col xs={12} style={{ display: 'flex', justifyContent: 'center' }}>
+          <button
+            style={{
+              marginRight: 8,
+              padding: '6px 14px',
+              cursor: 'pointer',
+              background: '#ffffff',
+              border: '1px solid #d0d7de',
+              borderRadius: 20,
+              boxShadow: '0 1px 2px rgba(0,0,0,0.06)',
+              fontFamily: 'Shobhika-Regular, Shobhika, serif',
+              fontSize: 16
+            }}
+            onClick={() => {
+              const root = document.documentElement;
+              const computed = getComputedStyle(root).getPropertyValue('--verse-font-size') || '20px';
+              const current = parseInt(computed, 10) || 20;
+              root.style.setProperty('--verse-font-size', `${Math.max(12, current - 2)}px`);
+            }}
+          >
+            अ-
+          </button>
+          <button
+            style={{
+              padding: '6px 14px',
+              cursor: 'pointer',
+              background: '#ffffff',
+              border: '1px solid #d0d7de',
+              borderRadius: 20,
+              boxShadow: '0 1px 2px rgba(0,0,0,0.06)',
+              fontFamily: 'Shobhika-Regular, Shobhika, serif',
+              fontSize: 16
+            }}
+            onClick={() => {
+              const root = document.documentElement;
+              const computed = getComputedStyle(root).getPropertyValue('--verse-font-size') || '20px';
+              const current = parseInt(computed, 10) || 20;
+              root.style.setProperty('--verse-font-size', `${Math.min(40, current + 2)}px`);
+            }}
+          >
+            अ+
+          </button>
+        </Col>
+      </Row>
+      </div>
     )
   }
 }

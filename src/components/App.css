@@ -33,4 +33,5 @@
 
 .display-linebreak {
   white-space: pre-line;
+  font-size: var(--verse-font-size, 20px);
 }
