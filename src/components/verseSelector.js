@@ -68,18 +68,20 @@ class VerseSelector extends Component {
             >
               &#8592;
             </button>
-            <Select
-              native
-              labelId="book-label"
-              id="book-select"
-              value={currentBook}
-              onChange={this.selectBook.bind(this)}
-              style={{ minWidth: '80px' }}
-            >
+            <div className="centered-select">
+              <Select
+                native
+                labelId="book-label"
+                id="book-select"
+                value={currentBook}
+                onChange={this.selectBook.bind(this)}
+                style={{ minWidth: '60px' }}
+              >
               {[1, 2, 3, 4, 5, 6].map(i => (
                 <option value={i} key={i}>{i}</option>
               ))}
-            </Select>
+              </Select>
+            </div>
             <button
               style={{ marginLeft: '8px', background: '#f0f0f0', border: 'none', borderRadius: '50%', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px', cursor: 'pointer' }}
               disabled={Number(currentBook) >= 6}
@@ -109,19 +111,21 @@ class VerseSelector extends Component {
             >
               &#8592;
             </button>
-            <Select
-              native
-              labelId="chapter-label"
-              id="chapter-select"
-              value={currentChapter}
-              onChange={this.selectChapter.bind(this)}
-              style={{ minWidth: '80px' }}
-            >
+            <div className="centered-select">
+              <Select
+                native
+                labelId="chapter-label"
+                id="chapter-select"
+                value={currentChapter}
+                onChange={this.selectChapter.bind(this)}
+                style={{ minWidth: '60px' }}
+              >
               {maxChapters > 0 && [...Array(maxChapters).keys()].map(i => {
                 i += 1;
                 return <option value={i} key={i}>{i}</option>;
               })}
-            </Select>
+              </Select>
+            </div>
             <button
               style={{ marginLeft: '8px', background: '#f0f0f0', border: 'none', borderRadius: '50%', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px', cursor: 'pointer' }}
               disabled={currentChapter >= maxChapters}

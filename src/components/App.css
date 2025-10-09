@@ -35,3 +35,11 @@
   white-space: pre-line;
   font-size: var(--verse-font-size, 20px);
 }
+
+.centered-select {
+  text-align: center;
+}
+
+.centered-select select {
+  text-align: center;
+}
