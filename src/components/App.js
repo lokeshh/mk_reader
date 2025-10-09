@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 import './App.css';
 import OmLogo from './OM.png';
 import {
@@ -9,42 +9,39 @@ import VerseDisplay from './verseDisplay';
 import CommDisplay from './commDisplay';
 import CommAbsDisplay from './commAbsDisplay';
 
-export default class App extends Component {
+const App = () => {
+  return (
+    <div className="App">
+      <header className="App-header">
+        <img src={OmLogo} height='50px' width='50px' alt='OM'/>
+      </header>
+      <Container>
+        <br />
+        <Row>
+          <Col>
+            <h3>मोक्षोपायः</h3>
+          </Col>
+        </Row>
 
-  
+        <br />
 
-  render() {
-    return (
-      <div className="App">
-        <header className="App-header">
-          <img src={OmLogo} height='50px' width='50px' alt='OM'/>
-        </header>
-        <Container>
-          <br />
-          <Row>
-            <Col>
-              <h3>मोक्षोपायः</h3>
-            </Col>
-          </Row>
+        <VerseSelector />
 
-          <br />
+        <hr />
 
-          <VerseSelector />
+        <VerseDisplay />
 
-          <hr />
+        {/* <br />
 
-          <VerseDisplay />
+        <CommAbsDisplay />
 
-          {/* <br />
+        <br />
 
-          <CommAbsDisplay />
+        <CommDisplay /> */}
+      </Container>
 
-          <br />
-
-          <CommDisplay /> */}
-        </Container>
-
-      </div>
-    );
-  }
+    </div>
+  );
 }
+
+export default App;

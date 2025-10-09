@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import { connect } from 'react-redux';
 
@@ -8,7 +8,7 @@ import CardContent from '@material-ui/core/CardContent';
 import Typography from '@material-ui/core/Typography';
 
 
-const classes = makeStyles({
+const useStyles = makeStyles({
     root: {
       minWidth: 275,
     },
@@ -25,33 +25,26 @@ const classes = makeStyles({
     },
   });
 
-
-class CommDisplay extends Component {
-
-    render() {
-        return (
-            <Card className={classes.root} style={{backgroundColor: '#ffc10733'}}>
-            <CardContent>
-              <Typography className={classes.title} color="textPrimary" gutterBottom>
-              {this.props.displayComm}
-              </Typography>
-              <Typography variant="h5" component="h2">
-              </Typography>
-            </CardContent>
-            <CardActions>
-              <Typography varient="h6" color="textSecondary">-Vihari Lala Mitra</Typography>
-            </CardActions>
-
-          </Card>
-      
-      
-        )
-    }
-    
+const CommDisplay = ({ displayComm }) => {
+  const classes = useStyles();
+  return (
+    <Card className={classes.root} style={{backgroundColor: '#ffc10733'}}>
+      <CardContent>
+        <Typography className={classes.title} color="textPrimary" gutterBottom>
+          {displayComm}
+        </Typography>
+        <Typography variant="h5" component="h2">
+        </Typography>
+      </CardContent>
+      <CardActions>
+        <Typography variant="h6" color="textSecondary">-Vihari Lala Mitra</Typography>
+      </CardActions>
+    </Card>
+  );
 }
 
 function mapStateToProps({ verseReducer: { displayComm } }) {
     return { displayComm };
   }
   
-  export default connect(mapStateToProps)(CommDisplay);
+export default connect(mapStateToProps)(CommDisplay);

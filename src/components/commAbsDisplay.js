@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import { connect } from 'react-redux';
 
@@ -8,7 +8,7 @@ import CardContent from '@material-ui/core/CardContent';
 import Typography from '@material-ui/core/Typography';
 
 
-const classes = makeStyles({
+const useStyles = makeStyles({
     root: {
       minWidth: 275,
     },
@@ -25,37 +25,28 @@ const classes = makeStyles({
     },
   });
 
-
-class CommAbsDisplay extends Component {
-
-    render() {
-        return (
-            <Card className={classes.root} style={{backgroundColor: '#ffc10733'}}>
-            <CardContent>
-              <Typography className={classes.title} component={'div'} color="textPrimary" gutterBottom>
-              {
-                this.props.displayCommAbs.map((line, index) => {
-                  return <div key={index}>{ line }<br /></div>
-                })
-              }
-              </Typography>
-              <Typography variant="h5" component="h2">
-              </Typography>
-            </CardContent>
-            <CardActions>
-              <Typography varient="h6" color="textSecondary">-Ananda Bodhendra Saraswati</Typography>
-            </CardActions>
-
-          </Card>
-      
-      
-        )
-    }
-    
+const CommAbsDisplay = ({ displayCommAbs }) => {
+  const classes = useStyles();
+  return (
+    <Card className={classes.root} style={{backgroundColor: '#ffc10733'}}>
+      <CardContent>
+        <Typography className={classes.title} component={'div'} color="textPrimary" gutterBottom>
+          {displayCommAbs.map((line, index) => (
+            <div key={index}>{ line }<br /></div>
+          ))}
+        </Typography>
+        <Typography variant="h5" component="h2">
+        </Typography>
+      </CardContent>
+      <CardActions>
+        <Typography variant="h6" color="textSecondary">-Ananda Bodhendra Saraswati</Typography>
+      </CardActions>
+    </Card>
+  );
 }
 
 function mapStateToProps({ verseReducer: { displayCommAbs } }) {
     return { displayCommAbs };
   }
   
-  export default connect(mapStateToProps)(CommAbsDisplay);
+export default connect(mapStateToProps)(CommAbsDisplay);

@@ -9,14 +9,16 @@ import InputLabel from '@material-ui/core/InputLabel';
 
 class VerseSelector extends Component {
   componentDidMount() {
-    if (this.props.location.pathname === '/') {
-      this.props.history.push(`/1/1`)
-      window.location.reload()
+    const { pathname } = this.props.location;
+    if (pathname === '/') {
+      this.props.history.push(`/1/1`);
+      return;
     }
-    var x = this.props.location.pathname.split('/');
-
-    this.props.changeBook(x[1])
-    this.props.changeChapter(x[1], x[2])
+    const parts = pathname.split('/');
+    const book = Number(parts[1]) || 1;
+    const chapter = Number(parts[2]) || 1;
+    this.props.changeBook(book);
+    this.props.changeChapter(book, chapter);
   }
 
   selectBook(e) {
