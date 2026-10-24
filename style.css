@@ -1073,10 +1073,19 @@ kbd {
    Responsive Design
    -------------------------------------------------------------------------- */
 @media (max-width: 860px) {
+  /* Unstick top panel on mobile: scrolls away naturally */
+  .app-header {
+    position: static;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    box-shadow: none;
+  }
+
   .header-container {
     flex-direction: column;
     align-items: stretch;
     gap: 12px;
+    padding: 10px 14px;
   }
 
   .nav-controls {
@@ -1091,13 +1100,64 @@ kbd {
     display: none;
   }
 
+  /* Maximize reading width by trimming left/right padding */
+  .app-main {
+    padding: 16px 10px 40px;
+  }
+
+  .content-container {
+    padding: 0;
+    max-width: 100%;
+  }
+
+  .sarga-banner {
+    padding: 20px 6px 14px;
+    margin-bottom: 16px;
+  }
+
+  .sarga-heading {
+    font-size: 1.85rem;
+  }
+
+  .verses-container {
+    gap: 20px;
+    width: 100%;
+    max-width: 100%;
+    padding: 0;
+  }
+
+  .verse-stanza {
+    padding: 8px 6px;
+    border-radius: var(--radius-sm);
+  }
+
   .verse-lines {
     text-align: left;
-    padding: 0 4px;
+    padding: 0;
+    font-size: calc(var(--verse-font-size) * 0.88);
+    line-height: 2.0;
   }
 }
 
 @media (max-width: 520px) {
+  .app-main {
+    padding: 10px 6px 36px;
+  }
+
+  .verse-stanza {
+    padding: 6px 4px;
+  }
+
+  .verse-lines {
+    font-size: calc(var(--verse-font-size) * 0.84);
+  }
+
+  .verse-num {
+    padding: 0 4px;
+    margin-left: 4px;
+    font-size: 0.9em;
+  }
+
   .control-group {
     flex: 1 1 100%;
   }
