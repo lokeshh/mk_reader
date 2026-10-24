@@ -84,6 +84,10 @@
   const state = {
     // Parsed database: prakarana -> sarga -> array of verses
     data: {},
+    allVerses: [], // Flat index of all 29,908 verses for global search
+    searchScope: 'sarga', // 'sarga' or 'all'
+    globalMatches: [],
+    globalDisplayLimit: 60,
     currentPrakarana: 1,
     currentSarga: 1,
     targetVerse: null,
@@ -108,6 +112,8 @@
     el.btnNextSargaNav = document.getElementById('btn-next-sarga-nav');
     el.verseFilterInput = document.getElementById('verse-filter-input');
     el.btnClearSearch = document.getElementById('btn-clear-search');
+    el.scopeSargaBtn = document.getElementById('scope-sarga-btn');
+    el.scopeAllBtn = document.getElementById('scope-all-btn');
 
     el.btnFontDec = document.getElementById('btn-font-dec');
     el.btnFontInc = document.getElementById('btn-font-inc');
@@ -147,6 +153,7 @@
   function parseMokshopayaText(rawText) {
     const lines = rawText.split(/\r?\n/);
     const database = {};
+    state.allVerses = [];
 
     for (let p = 1; p <= 7; p++) {
       database[p] = {};
@@ -178,7 +185,7 @@
           const devRef = `${toDevanagariNum(pNum)}.${toDevanagariNum(sNum)}.${vRaw}`;
           const asciiRef = `${pNum}.${sNum}.${vAscii}`;
 
-          database[pNum][sNum].push({
+          const verseObj = {
             p: pNum,
             s: sNum,
             v: vRaw,
@@ -187,7 +194,10 @@
             refAscii: asciiRef,
             lines: [...verseLinesBuffer],
             fullText: verseLinesBuffer.join('\n')
-          });
+          };
+
+          database[pNum][sNum].push(verseObj);
+          state.allVerses.push(verseObj);
         }
 
         verseLinesBuffer = [];
@@ -220,7 +230,7 @@
         throw new Error(`HTTP error ${response.status}`);
       }
       text = await response.text();
-      updateLoader(75, 'Parsing 30,000 verses across 7 प्रकरणानि...');
+      updateLoader(75, 'Parsing 29,908 verses across 7 प्रकरणानि...');
       state.data = parseMokshopayaText(text);
       setCachedText(text); // Async save to cache
       finishLoading();
@@ -293,6 +303,15 @@
   // View Rendering
   // ---------------------------------------------------------------------------
   function renderCurrentSarga() {
+    // Keep exact user query (preserving leading, trailing, and internal spaces)
+    const query = state.searchFilter;
+
+    // If global search is active and a query is typed, display global search results
+    if (state.searchScope === 'all' && query.length > 0) {
+      renderGlobalSearchResults(query);
+      return;
+    }
+
     const p = state.currentPrakarana;
     const s = state.currentSarga;
     const meta = PRAKARANA_META[p];
@@ -309,17 +328,22 @@
     el.currentSargaTitle.textContent = `सर्गः ${toDevanagariNum(s)}`;
     document.title = `${meta.name} • सर्गः ${toDevanagariNum(s)} • मोक्षोपायः`;
 
-    // 3. Filter verses if query exists
-    const query = state.searchFilter.trim().toLowerCase();
+    // 3. Filter verses if query exists within current sarga
     let displayVerses = verses;
 
-    if (query) {
-      const queryAscii = toAsciiNum(query);
+    if (query.length > 0) {
+      const trimmedQuery = query.trim();
+      const queryAscii = toAsciiNum(trimmedQuery);
+      const queryLower = query.toLowerCase();
+
       displayVerses = verses.filter(v => {
-        // Match by verse number (e.g. 15 or १५)
-        if (v.vAscii === queryAscii || v.v === query) return true;
-        // Match by Sanskrit text content
-        return v.fullText.toLowerCase().includes(query);
+        // If user typed a verse number (with or without surrounding space)
+        if (trimmedQuery && (v.vAscii === queryAscii || v.v === trimmedQuery)) return true;
+        // Check exact match in fullText (preserves spaces entered by user)
+        if (v.fullText.toLowerCase().includes(queryLower)) return true;
+        // Also check with newlines replaced by space (for multi-word queries spanning lines)
+        if (v.fullText.replace(/\r?\n/g, ' ').toLowerCase().includes(queryLower)) return true;
+        return false;
       });
 
       el.bannerFilterStatus.classList.remove('hidden');
@@ -333,10 +357,19 @@
     if (displayVerses.length === 0) {
       el.versesContainer.innerHTML = `
         <div class="no-match-message">
-          <p>न को ऽपि श्लोकः सम्प्राप्तः (No verses matching the filter)</p>
-          <button id="btn-empty-clear" class="btn btn-primary btn-sm">Clear Filter</button>
+          <p>अस्मिन् सर्गे न को ऽपि श्लोकः सम्प्राप्तः (No verses matching "${query}" in Sarga ${toDevanagariNum(s)})</p>
+          <div style="display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-top: 14px;">
+            <button id="btn-search-all-suggestion" class="btn btn-primary btn-sm">
+              🔍 समग्रग्रन्थे अन्विष्यताम् (Search in all 29,908 verses)
+            </button>
+            <button id="btn-empty-clear" class="btn btn-subtle btn-sm">Clear Filter</button>
+          </div>
         </div>
       `;
+      const searchAllBtn = document.getElementById('btn-search-all-suggestion');
+      if (searchAllBtn) {
+        searchAllBtn.addEventListener('click', () => setSearchScope('all'));
+      }
       const emptyBtn = document.getElementById('btn-empty-clear');
       if (emptyBtn) {
         emptyBtn.addEventListener('click', clearSearchFilter);
@@ -364,10 +397,9 @@
           lineDiv.className = 'verse-line';
 
           if (isLastLine) {
-            // Strip the raw trailing marker and append the interactive verse number
             const textWithoutMarker = lineText.replace(markerRegexOnly(verseObj.v), '').trimEnd();
             let renderedText = textWithoutMarker;
-            if (query) {
+            if (query.length > 0) {
               renderedText = highlightMatch(renderedText, query);
             }
             lineDiv.innerHTML = `${renderedText} <span class="verse-num" title="Verse ${verseObj.refDev} (${verseObj.refAscii}) • Click to copy link">॥&nbsp;${verseObj.refDev}&nbsp;॥</span>`;
@@ -377,7 +409,7 @@
               numSpan.addEventListener('click', () => copyVerseLink(verseObj));
             }
           } else {
-            if (query) {
+            if (query.length > 0) {
               lineDiv.innerHTML = highlightMatch(lineText, query);
             } else {
               lineDiv.textContent = lineText;
@@ -387,7 +419,7 @@
           linesContainer.appendChild(lineDiv);
         });
 
-        // Quick floating action buttons (shown smoothly on hover)
+        // Quick floating action buttons
         const actions = document.createElement('div');
         actions.className = 'verse-quick-actions';
 
@@ -435,6 +467,170 @@
         }
       }, 100);
     }
+  }
+
+  // ---------------------------------------------------------------------------
+  // Global Text Search (Across all 29,908 verses in all 7 Books)
+  // ---------------------------------------------------------------------------
+  function renderGlobalSearchResults(query) {
+    const trimmedQuery = query.trim();
+    const queryAscii = toAsciiNum(trimmedQuery);
+    const queryLower = query.toLowerCase();
+
+    // Fast scanning across all 29,908 verses (preserving user-entered spaces)
+    const matches = state.allVerses.filter(v => {
+      // Verse number or full reference match
+      if (trimmedQuery && (v.vAscii === queryAscii || v.refAscii === queryAscii || v.refDev === trimmedQuery)) {
+        return true;
+      }
+      // Check exact match in fullText (preserves spaces entered by user)
+      if (v.fullText.toLowerCase().includes(queryLower)) return true;
+      // Also check with newlines replaced by space (for multi-word queries spanning lines)
+      if (v.fullText.replace(/\r?\n/g, ' ').toLowerCase().includes(queryLower)) return true;
+      return false;
+    });
+
+    state.globalMatches = matches;
+
+    // Update Banner for Global Search
+    el.bannerPrakaranaName.textContent = 'समग्रश्लोकशोधनम् • Global Text Search';
+    el.bannerVerseCount.textContent = `${toDevanagariNum(matches.length)} श्लोकाः सम्प्राप्ताः`;
+    el.currentSargaTitle.textContent = `शोधपरिणामाः ("${query}")`;
+    document.title = `शोधः "${query}" (${matches.length}) • मोक्षोपायः`;
+
+    el.bannerFilterStatus.classList.remove('hidden');
+    el.filterQueryText.textContent = `"${query}" (समग्रग्रन्थे / All 7 Books)`;
+    el.filterMatchCount.textContent = toDevanagariNum(matches.length);
+
+    // Bottom Navigation in Global Search Mode
+    el.btnPrevSargaNav.disabled = true;
+    el.btnNextSargaNav.disabled = true;
+    el.btnBottomPrev.disabled = false;
+    el.bottomPrevLabel.textContent = `सर्गं प्रति निवर्तताम् (Return to Sarga ${toDevanagariNum(state.currentSarga)})`;
+    el.btnBottomNext.disabled = false;
+    el.bottomNextLabel.textContent = 'शीर्षम् (Top) ↑';
+
+    if (matches.length === 0) {
+      el.versesContainer.innerHTML = `
+        <div class="no-match-message">
+          <p>समस्तग्रन्थे न को ऽपि श्लोकः सम्प्राप्तः (No verses matching "${query}" in all 7 Books)</p>
+          <button id="btn-empty-clear" class="btn btn-primary btn-sm">Clear Search</button>
+        </div>
+      `;
+      const emptyBtn = document.getElementById('btn-empty-clear');
+      if (emptyBtn) emptyBtn.addEventListener('click', clearSearchFilter);
+      return;
+    }
+
+    const fragment = document.createDocumentFragment();
+    const countToRender = Math.min(matches.length, state.globalDisplayLimit);
+
+    for (let i = 0; i < countToRender; i++) {
+      const verseObj = matches[i];
+      const stanza = document.createElement('article');
+      stanza.className = 'verse-stanza';
+      stanza.id = `verse-${verseObj.p}-${verseObj.s}-${verseObj.vAscii}`;
+
+      // Global context header showing Book name, Sarga #, and direct jump button
+      const contextHeader = document.createElement('div');
+      contextHeader.className = 'global-verse-header';
+      contextHeader.innerHTML = `
+        <span>
+          <span class="global-prakarana-tag">प्रकरणम् ${toDevanagariNum(verseObj.p)} (${PRAKARANA_META[verseObj.p].name})</span>
+          &nbsp;•&nbsp;सर्गः ${toDevanagariNum(verseObj.s)}
+        </span>
+        <button class="btn-open-sarga" title="Open this sarga in full reader">
+          सर्गं गच्छ (Open Chapter) →
+        </button>
+      `;
+
+      const btnOpen = contextHeader.querySelector('.btn-open-sarga');
+      btnOpen.addEventListener('click', () => {
+        state.searchScope = 'sarga';
+        if (el.scopeSargaBtn) el.scopeSargaBtn.classList.add('active');
+        if (el.scopeAllBtn) el.scopeAllBtn.classList.remove('active');
+        state.searchFilter = '';
+        el.verseFilterInput.value = '';
+        el.btnClearSearch.classList.add('hidden');
+        navigateTo(verseObj.p, verseObj.s, verseObj.vAscii);
+      });
+
+      const linesContainer = document.createElement('div');
+      linesContainer.className = 'verse-lines';
+
+      verseObj.lines.forEach((lineText, idx) => {
+        const isLastLine = (idx === verseObj.lines.length - 1);
+        const lineDiv = document.createElement('div');
+        lineDiv.className = 'verse-line';
+
+        if (isLastLine) {
+          const textWithoutMarker = lineText.replace(markerRegexOnly(verseObj.v), '').trimEnd();
+          const renderedText = highlightMatch(textWithoutMarker, query);
+          lineDiv.innerHTML = `${renderedText} <span class="verse-num" title="Verse ${verseObj.refDev} (${verseObj.refAscii}) • Click to copy link">॥&nbsp;${verseObj.refDev}&nbsp;॥</span>`;
+
+          const numSpan = lineDiv.querySelector('.verse-num');
+          if (numSpan) {
+            numSpan.addEventListener('click', () => copyVerseLink(verseObj));
+          }
+        } else {
+          lineDiv.innerHTML = highlightMatch(lineText, query);
+        }
+
+        linesContainer.appendChild(lineDiv);
+      });
+
+      // Quick actions
+      const actions = document.createElement('div');
+      actions.className = 'verse-quick-actions';
+
+      const btnCopy = document.createElement('button');
+      btnCopy.className = 'btn-verse-mini';
+      btnCopy.title = 'Copy verse';
+      btnCopy.setAttribute('aria-label', `Copy verse ${verseObj.refAscii}`);
+      btnCopy.innerHTML = '📋';
+      btnCopy.addEventListener('click', (e) => {
+        e.stopPropagation();
+        copyVerseToClipboard(verseObj);
+      });
+
+      const btnShare = document.createElement('button');
+      btnShare.className = 'btn-verse-mini';
+      btnShare.title = 'Copy link';
+      btnShare.setAttribute('aria-label', `Copy link to verse ${verseObj.refAscii}`);
+      btnShare.innerHTML = '🔗';
+      btnShare.addEventListener('click', (e) => {
+        e.stopPropagation();
+        copyVerseLink(verseObj);
+      });
+
+      actions.appendChild(btnCopy);
+      actions.appendChild(btnShare);
+
+      stanza.appendChild(contextHeader);
+      stanza.appendChild(linesContainer);
+      stanza.appendChild(actions);
+      fragment.appendChild(stanza);
+    }
+
+    // "Show more" button if results exceed current batch limit
+    if (matches.length > countToRender) {
+      const loadMoreContainer = document.createElement('div');
+      loadMoreContainer.className = 'load-more-container';
+      loadMoreContainer.innerHTML = `
+        <button id="btn-load-more" class="btn btn-primary btn-sm">
+          अधिकानि श्लोकानि दर्शयतु (Show next batch • ${countToRender} of ${matches.length})
+        </button>
+      `;
+      const btnMore = loadMoreContainer.querySelector('#btn-load-more');
+      btnMore.addEventListener('click', () => {
+        state.globalDisplayLimit += 60;
+        renderGlobalSearchResults(query);
+      });
+      fragment.appendChild(loadMoreContainer);
+    }
+
+    el.versesContainer.innerHTML = '';
+    el.versesContainer.appendChild(fragment);
   }
 
   function markerRegexOnly(v) {
@@ -560,9 +756,27 @@
   // ---------------------------------------------------------------------------
   // Search & Filtering
   // ---------------------------------------------------------------------------
+  function setSearchScope(scope) {
+    state.searchScope = scope;
+    if (scope === 'all') {
+      if (el.scopeAllBtn) el.scopeAllBtn.classList.add('active');
+      if (el.scopeSargaBtn) el.scopeSargaBtn.classList.remove('active');
+      if (el.verseFilterInput) el.verseFilterInput.placeholder = 'समस्तश्लोकेषु शोधयन्तु (All 29,908 verses)...';
+    } else {
+      if (el.scopeSargaBtn) el.scopeSargaBtn.classList.add('active');
+      if (el.scopeAllBtn) el.scopeAllBtn.classList.remove('active');
+      if (el.verseFilterInput) el.verseFilterInput.placeholder = 'Verse # or word in sarga...';
+    }
+
+    state.globalDisplayLimit = 60;
+    renderCurrentSarga();
+    if (el.verseFilterInput) el.verseFilterInput.focus();
+  }
+
   function handleSearchInput(e) {
     const val = e.target.value;
     state.searchFilter = val;
+    state.globalDisplayLimit = 60;
     if (val) {
       el.btnClearSearch.classList.remove('hidden');
     } else {
@@ -573,6 +787,7 @@
 
   function clearSearchFilter() {
     state.searchFilter = '';
+    state.globalDisplayLimit = 60;
     el.verseFilterInput.value = '';
     el.btnClearSearch.classList.add('hidden');
     renderCurrentSarga();
@@ -663,8 +878,28 @@
     // Prev / Next button handlers
     el.btnPrevSargaNav.addEventListener('click', goToPreviousSarga);
     el.btnNextSargaNav.addEventListener('click', goToNextSarga);
-    el.btnBottomPrev.addEventListener('click', goToPreviousSarga);
-    el.btnBottomNext.addEventListener('click', goToNextSarga);
+    el.btnBottomPrev.addEventListener('click', () => {
+      if (state.searchScope === 'all' && state.searchFilter.length > 0) {
+        clearSearchFilter();
+      } else {
+        goToPreviousSarga();
+      }
+    });
+    el.btnBottomNext.addEventListener('click', () => {
+      if (state.searchScope === 'all' && state.searchFilter.length > 0) {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
+        goToNextSarga();
+      }
+    });
+
+    // Scope toggle buttons
+    if (el.scopeSargaBtn) {
+      el.scopeSargaBtn.addEventListener('click', () => setSearchScope('sarga'));
+    }
+    if (el.scopeAllBtn) {
+      el.scopeAllBtn.addEventListener('click', () => setSearchScope('all'));
+    }
 
     // Scroll to top
     el.btnBackToTop.addEventListener('click', () => {

@@ -82,11 +82,17 @@
           </div>
         </div>
 
-        <!-- Jump to Verse / Filter in Sarga -->
+        <!-- Jump to Verse / Filter in Sarga or Global -->
         <div class="control-group search-control-group">
-          <label for="verse-filter-input" class="control-label">श्लोकशोधनम् (Find)</label>
+          <div class="search-header-row">
+            <label for="verse-filter-input" class="control-label">श्लोकशोधनम् (Find)</label>
+            <div class="search-scope-pill" role="group" aria-label="Search Scope">
+              <button type="button" id="scope-sarga-btn" class="scope-btn active" title="Search inside current Sarga">सर्गे</button>
+              <button type="button" id="scope-all-btn" class="scope-btn" title="Search across all 29,908 verses in all 7 Books">समग्रे</button>
+            </div>
+          </div>
           <div class="search-input-wrapper">
-            <input type="text" id="verse-filter-input" class="styled-input" placeholder="Verse # or word..." aria-label="Filter verses in active sarga">
+            <input type="text" id="verse-filter-input" class="styled-input" placeholder="Verse # or word..." aria-label="Filter verses">
             <button id="btn-clear-search" class="btn-clear hidden" title="Clear filter" aria-label="Clear filter">✕</button>
           </div>
         </div>
@@ -181,8 +187,15 @@
         <button id="btn-close-modal" class="btn-close" aria-label="Close modal">✕</button>
       </div>
       <div class="modal-body">
-        <p>The <strong>Mokṣopāya</strong> (मोक्षोपाय, "The Means to Liberation") is a monumental Sanskrit philosophical masterpiece of Advaita and Kashmir Shaiva non-dual thought, composed in ~30,000 verses across 7 prakaraṇas.</p>
+        <p>The <strong>Mokṣopāya</strong> (मोक्षोपाय, "The Means to Liberation") is a monumental Sanskrit philosophical masterpiece of Advaita and Kashmir Shaiva non-dual thought, composed in <strong>29,908 verses</strong> across 7 prakaraṇas.</p>
         
+        <h4>मूलग्रन्थस्रोत निर्देशः (Source & Edition)</h4>
+        <div class="source-citation-card">
+          <p class="source-citation">
+            Anonymus Casmiriensis: <em>Mokṣopāya. Historisch-kritische Gesamtausgabe</em>. Herausgegeben unter der Leitung von Walter Slaje. Wiesbaden 2011–2025 (Akademie der Wissenschaften und der Literatur, Mainz. Veröffentlichungen der Indologischen Kommission).
+          </p>
+        </div>
+
         <h4>सप्त प्रकरणानि (The 7 Prakaraṇas)</h4>
         <ol class="prakarana-list">
           <li><strong>वैराग्यप्रकरणम् (Vairāgya)</strong> — ३२ सर्गाः (1,078 verses)</li>

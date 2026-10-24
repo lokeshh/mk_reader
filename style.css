@@ -394,9 +394,49 @@ body {
   min-width: 105px;
 }
 
-/* Search input */
+/* Search input & Scope selector */
 .search-control-group {
-  min-width: 160px;
+  min-width: 190px;
+}
+
+.search-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.search-scope-pill {
+  display: inline-flex;
+  align-items: center;
+  background-color: var(--bg-hover);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-full);
+  padding: 1px;
+}
+
+.scope-btn {
+  background: none;
+  border: none;
+  font-family: var(--font-sanskrit), var(--font-ui);
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  padding: 2px 7px;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  line-height: 1.2;
+}
+
+.scope-btn:hover {
+  color: var(--text-main);
+}
+
+.scope-btn.active {
+  background-color: var(--primary);
+  color: var(--primary-contrast);
+  box-shadow: var(--shadow-sm);
 }
 
 .search-input-wrapper {
@@ -733,6 +773,7 @@ body {
 .verse-line {
   margin-bottom: 6px;
   text-align: left;
+  white-space: pre-wrap;
 }
 
 .verse-line:last-child {
@@ -811,18 +852,69 @@ body {
   margin-bottom: 16px;
 }
 
+/* Global Search Specific Elements */
+.global-verse-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 8px;
+  padding-bottom: 4px;
+  border-bottom: 1px dashed var(--border-subtle);
+  font-family: var(--font-sanskrit), var(--font-ui);
+  font-size: 0.82rem;
+  color: var(--text-dim);
+}
+
+.global-prakarana-tag {
+  color: var(--primary);
+  font-weight: 700;
+}
+
+.btn-open-sarga {
+  background: var(--bg-hover);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-main);
+  font-family: var(--font-sanskrit), var(--font-ui);
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+}
+
+.btn-open-sarga:hover {
+  background-color: var(--primary);
+  color: var(--primary-contrast);
+  border-color: var(--primary);
+}
+
+.load-more-container {
+  display: flex;
+  justify-content: center;
+  padding: 24px 0 12px;
+}
+
 /* Highlighted search match in text */
 mark.search-match {
   background-color: #fde047;
   color: #1c1917;
-  padding: 1px 4px;
-  border-radius: 3px;
+  padding: 1px 1px;
+  border-radius: 2px;
   font-weight: bold;
+  white-space: pre-wrap;
 }
 
 [data-theme="dark"] mark.search-match {
   background-color: #ca8a04;
   color: #ffffff;
+}
+
+[data-theme="sepia"] mark.search-match {
+  background-color: #f5d061;
+  color: #2b1810;
 }
 
 /* --------------------------------------------------------------------------
@@ -990,6 +1082,26 @@ mark.search-match {
   margin: 18px 0 8px;
   color: var(--primary);
   font-size: 1.05rem;
+}
+
+.source-citation-card {
+  background-color: var(--bg-hover);
+  border: 1px solid var(--border-subtle);
+  border-left: 3px solid var(--primary);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  margin: 6px 0 14px;
+  font-size: 0.88rem;
+  line-height: 1.6;
+}
+
+.source-citation {
+  color: var(--text-main);
+}
+
+.source-citation em {
+  font-style: italic;
+  color: var(--primary);
 }
 
 .prakarana-list {

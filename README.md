@@ -1,6 +1,6 @@
 # मोक्षोपायशास्त्रम् • Mokṣopāya Reader
 
-A high-performance, responsive Single Page Application (SPA) designed to read, explore, and search the entire **Mokṣopāya** (मोक्षोपाय) text (~30,000 verses across 7 प्रकरणानि).
+A high-performance, responsive Single Page Application (SPA) designed to read, explore, and search the entire **Mokṣopāya** (मोक्षोपाय) text (29,908 verses across 7 प्रकरणानि).
 
 Live at: **https://mk-reader.netlify.app/**
 
@@ -43,3 +43,8 @@ Deploy directly to **Netlify** (or GitHub Pages / Vercel) by connecting the repo
 - `f` or `/` : Focus verse filter
 - `t` : Toggle visual theme (Parchment / Dark / Sepia)
 - `Esc` : Clear search filter
+
+## Text Source & Attribution
+
+> **Anonymus Casmiriensis: Mokṣopāya. Historisch-kritische Gesamtausgabe.**  
+> Herausgegeben unter der Leitung von Walter Slaje. Wiesbaden 2011–2025 (Akademie der Wissenschaften und der Literatur, Mainz. Veröffentlichungen der Indologischen Kommission).
