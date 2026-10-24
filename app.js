@@ -185,6 +185,13 @@
           const devRef = `${toDevanagariNum(pNum)}.${toDevanagariNum(sNum)}.${vRaw}`;
           const asciiRef = `${pNum}.${sNum}.${vAscii}`;
 
+          // Clean lines: strip the trailing verse marker tag from the last line so
+          // metadata tags (and their leading space) never leak into search or display
+          const cleanLines = [...verseLinesBuffer];
+          const lastIdx = cleanLines.length - 1;
+          cleanLines[lastIdx] = cleanLines[lastIdx].replace(/\s*॥\s*[०-९0-9]+\.[०-९0-9]+\.[^\s॥]+\s*॥\s*$/, '').trimEnd();
+          const cleanFullText = cleanLines.join('\n');
+
           const verseObj = {
             p: pNum,
             s: sNum,
@@ -192,8 +199,8 @@
             vAscii: vAscii,
             refDev: devRef,
             refAscii: asciiRef,
-            lines: [...verseLinesBuffer],
-            fullText: verseLinesBuffer.join('\n')
+            lines: cleanLines,
+            fullText: cleanFullText
           };
 
           database[pNum][sNum].push(verseObj);
@@ -331,20 +338,13 @@
     // 3. Filter verses if query exists within current sarga
     let displayVerses = verses;
 
-    if (query.length > 0) {
-      const trimmedQuery = query.trim();
-      const queryAscii = toAsciiNum(trimmedQuery);
-      const queryLower = query.toLowerCase();
-
-      displayVerses = verses.filter(v => {
-        // If user typed a verse number (with or without surrounding space)
-        if (trimmedQuery && (v.vAscii === queryAscii || v.v === trimmedQuery)) return true;
-        // Check exact match in fullText (preserves spaces entered by user)
-        if (v.fullText.toLowerCase().includes(queryLower)) return true;
-        // Also check with newlines replaced by space (for multi-word queries spanning lines)
-        if (v.fullText.replace(/\r?\n/g, ' ').toLowerCase().includes(queryLower)) return true;
-        return false;
-      });
+    if (query) {
+      const q = query.toLowerCase();
+      displayVerses = verses.filter(v =>
+        v.fullText.toLowerCase().includes(q) ||
+        v.v === query ||
+        v.vAscii === query
+      );
 
       el.bannerFilterStatus.classList.remove('hidden');
       el.filterQueryText.textContent = `"${query}"`;
@@ -396,12 +396,12 @@
           const lineDiv = document.createElement('div');
           lineDiv.className = 'verse-line';
 
+          let renderedText = lineText;
+          if (query.length > 0) {
+            renderedText = highlightMatch(renderedText, query);
+          }
+
           if (isLastLine) {
-            const textWithoutMarker = lineText.replace(markerRegexOnly(verseObj.v), '').trimEnd();
-            let renderedText = textWithoutMarker;
-            if (query.length > 0) {
-              renderedText = highlightMatch(renderedText, query);
-            }
             lineDiv.innerHTML = `${renderedText} <span class="verse-num" title="Verse ${verseObj.refDev} (${verseObj.refAscii}) • Click to copy link">॥&nbsp;${verseObj.refDev}&nbsp;॥</span>`;
 
             const numSpan = lineDiv.querySelector('.verse-num');
@@ -409,11 +409,7 @@
               numSpan.addEventListener('click', () => copyVerseLink(verseObj));
             }
           } else {
-            if (query.length > 0) {
-              lineDiv.innerHTML = highlightMatch(lineText, query);
-            } else {
-              lineDiv.textContent = lineText;
-            }
+            lineDiv.innerHTML = renderedText;
           }
 
           linesContainer.appendChild(lineDiv);
@@ -473,22 +469,16 @@
   // Global Text Search (Across all 29,908 verses in all 7 Books)
   // ---------------------------------------------------------------------------
   function renderGlobalSearchResults(query) {
-    const trimmedQuery = query.trim();
-    const queryAscii = toAsciiNum(trimmedQuery);
-    const queryLower = query.toLowerCase();
+    const q = query.toLowerCase();
 
-    // Fast scanning across all 29,908 verses (preserving user-entered spaces)
-    const matches = state.allVerses.filter(v => {
-      // Verse number or full reference match
-      if (trimmedQuery && (v.vAscii === queryAscii || v.refAscii === queryAscii || v.refDev === trimmedQuery)) {
-        return true;
-      }
-      // Check exact match in fullText (preserves spaces entered by user)
-      if (v.fullText.toLowerCase().includes(queryLower)) return true;
-      // Also check with newlines replaced by space (for multi-word queries spanning lines)
-      if (v.fullText.replace(/\r?\n/g, ' ').toLowerCase().includes(queryLower)) return true;
-      return false;
-    });
+    // Fast scanning across all 29,908 verses as-is without trimming
+    const matches = state.allVerses.filter(v =>
+      v.fullText.toLowerCase().includes(q) ||
+      v.refAscii === query ||
+      v.refDev === query ||
+      v.vAscii === query ||
+      v.v === query
+    );
 
     state.globalMatches = matches;
 
@@ -563,9 +553,12 @@
         const lineDiv = document.createElement('div');
         lineDiv.className = 'verse-line';
 
+        let renderedText = lineText;
+        if (query.length > 0) {
+          renderedText = highlightMatch(renderedText, query);
+        }
+
         if (isLastLine) {
-          const textWithoutMarker = lineText.replace(markerRegexOnly(verseObj.v), '').trimEnd();
-          const renderedText = highlightMatch(textWithoutMarker, query);
           lineDiv.innerHTML = `${renderedText} <span class="verse-num" title="Verse ${verseObj.refDev} (${verseObj.refAscii}) • Click to copy link">॥&nbsp;${verseObj.refDev}&nbsp;॥</span>`;
 
           const numSpan = lineDiv.querySelector('.verse-num');
@@ -573,7 +566,7 @@
             numSpan.addEventListener('click', () => copyVerseLink(verseObj));
           }
         } else {
-          lineDiv.innerHTML = highlightMatch(lineText, query);
+          lineDiv.innerHTML = renderedText;
         }
 
         linesContainer.appendChild(lineDiv);
