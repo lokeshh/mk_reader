@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="sa" data-theme="parchment">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>मोक्षोपायः • Mokṣopāya Shāstra Reader</title>
+  <meta name="description" content="Single Page Application to read and explore the Mokṣopāya (मोक्षोपाय) text across all 7 prakaraṇas and sargas with verse navigation.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Outfit:wght@400;500;600;700&family=Tiro+Devanagari+Sanskrit:ital@0;1&family=Noto+Serif+Devanagari:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Loading & Progress Screen -->
+  <div id="loader-overlay" class="loader-overlay" role="status" aria-live="polite">
+    <div class="loader-content">
+      <div class="om-symbol" aria-hidden="true">ॐ</div>
+      <h2 class="loader-title">मोक्षोपायशास्त्रम्</h2>
+      <p class="loader-sub">Loading sacred text & indexing 7 प्रकरणानि...</p>
+      <div class="progress-bar-container">
+        <div id="loader-bar" class="progress-bar-fill"></div>
+      </div>
+      <p id="loader-status" class="loader-status">Fetching mk_data.txt...</p>
+      
+      <!-- Fallback file picker for file:// protocol restricted environments -->
+      <div id="file-picker-fallback" class="file-picker-fallback hidden">
+        <p class="file-warning">⚠️ Browser security restricts reading local files directly via <code>file://</code> protocol.</p>
+        <label for="local-file-input" class="btn btn-primary file-btn">
+          📂 Select mk_data.txt from this folder
+        </label>
+        <input type="file" id="local-file-input" accept=".txt" class="hidden-input">
+        <p class="file-hint">Or run: <code>python3 -m http.server 8000</code> and open <a href="http://localhost:8000">localhost:8000</a></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Navigation Header -->
+  <header class="app-header">
+    <div class="header-container">
+      <!-- Title & Branding -->
+      <div class="brand">
+        <div class="brand-om" aria-hidden="true">ॐ</div>
+        <div class="brand-text">
+          <h1 class="brand-title">मोक्षोपायः</h1>
+          <span class="brand-subtitle">Mokṣopāya Reader</span>
+        </div>
+      </div>
+
+      <!-- Controls: Prakarana & Sarga Selection -->
+      <nav class="nav-controls" aria-label="Text Navigation">
+        <!-- Prakarana Selector -->
+        <div class="control-group">
+          <label for="prakarana-select" class="control-label">प्रकरणम् (Book)</label>
+          <div class="custom-select-wrapper">
+            <select id="prakarana-select" class="styled-select" aria-label="Select Prakarana">
+              <option value="1">१. वैराग्यप्रकरणम् (1)</option>
+              <option value="2">२. मुमुक्षुव्यवहारप्रकरणम् (2)</option>
+              <option value="3">३. उत्पत्तिप्रकरणम् (3)</option>
+              <option value="4">४. स्थितिप्रकरणम् (4)</option>
+              <option value="5">५. उपशान्तिप्रकरणम् (5)</option>
+              <option value="6">६. निर्वाणप्रकरणम् (6)</option>
+              <option value="7">७. खिलप्रकरणम् (7)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Sarga Selector with Prev/Next arrows -->
+        <div class="control-group">
+          <label for="sarga-select" class="control-label">सर्गः (Chapter)</label>
+          <div class="sarga-selector-row">
+            <button id="btn-prev-sarga-nav" class="btn btn-icon" title="Previous Sarga (Left Arrow / [ )" aria-label="Previous Sarga">
+              ‹
+            </button>
+            <div class="custom-select-wrapper sarga-select-wrapper">
+              <select id="sarga-select" class="styled-select" aria-label="Select Sarga">
+                <!-- Dynamically populated -->
+              </select>
+            </div>
+            <button id="btn-next-sarga-nav" class="btn btn-icon" title="Next Sarga (Right Arrow / ] )" aria-label="Next Sarga">
+              ›
+            </button>
+          </div>
+        </div>
+
+        <!-- Jump to Verse / Filter in Sarga -->
+        <div class="control-group search-control-group">
+          <label for="verse-filter-input" class="control-label">श्लोकशोधनम् (Find)</label>
+          <div class="search-input-wrapper">
+            <input type="text" id="verse-filter-input" class="styled-input" placeholder="Verse # or word..." aria-label="Filter verses in active sarga">
+            <button id="btn-clear-search" class="btn-clear hidden" title="Clear filter" aria-label="Clear filter">✕</button>
+          </div>
+        </div>
+      </nav>
+
+      <!-- Utility Actions -->
+      <div class="utility-actions">
+        <!-- Font Size Controls -->
+        <div class="font-controls" role="group" aria-label="Text Size Controls">
+          <button id="btn-font-dec" class="btn btn-sm btn-subtle" title="Decrease font size" aria-label="Decrease font size">A−</button>
+          <button id="btn-font-inc" class="btn btn-sm btn-subtle" title="Increase font size" aria-label="Increase font size">A+</button>
+        </div>
+
+        <!-- Theme Picker -->
+        <div class="theme-dropdown-wrapper">
+          <button id="btn-theme-toggle" class="btn btn-sm btn-subtle btn-theme" title="Change theme" aria-label="Toggle visual theme">
+            <span id="theme-icon" aria-hidden="true">📜</span>
+            <span id="theme-label" class="hide-mobile">Parchment</span>
+          </button>
+          <div id="theme-menu" class="theme-menu hidden" role="menu">
+            <button class="theme-option active" data-set-theme="parchment" role="menuitem">📜 Parchment (सात्त्विक)</button>
+            <button class="theme-option" data-set-theme="dark" role="menuitem">🌌 Dark (निर्वाण)</button>
+            <button class="theme-option" data-set-theme="sepia" role="menuitem">🍂 Sepia (तालपत्र)</button>
+          </div>
+        </div>
+
+        <!-- Help / Info Modal Trigger -->
+        <button id="btn-info" class="btn btn-sm btn-icon btn-subtle" title="About Mokṣopāya & Shortcuts" aria-label="App info and shortcuts">ℹ</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Container -->
+  <main class="app-main">
+    <div class="content-container">
+      
+      <!-- Sarga Banner / Breadcrumb -->
+      <section class="sarga-banner" aria-labelledby="current-sarga-title">
+        <div class="sarga-banner-meta">
+          <span id="banner-prakarana-name" class="prakarana-pill">प्रकरणम् १ • वैराग्यप्रकरणम्</span>
+          <span id="banner-verse-count" class="verse-count-pill">३१ श्लोकाः</span>
+        </div>
+        <h2 id="current-sarga-title" class="sarga-heading">सर्गः १</h2>
+        <div class="sarga-divider" aria-hidden="true">❖ ॐ ❖</div>
+        <div id="banner-filter-status" class="filter-status-banner hidden">
+          <span>Filtering: <strong id="filter-query-text"></strong> (<span id="filter-match-count">0</span> matching verses)</span>
+          <button id="btn-reset-filter" class="btn-link">Show all verses</button>
+        </div>
+      </section>
+
+      <!-- Verse List Container -->
+      <section id="verses-container" class="verses-container" aria-label="Verses list">
+        <!-- Verses dynamically rendered here -->
+      </section>
+
+      <!-- Bottom Navigation Bar -->
+      <nav class="bottom-sarga-nav" aria-label="Bottom Sarga Navigation">
+        <button id="btn-bottom-prev" class="btn btn-nav-bottom" aria-label="Previous Sarga">
+          <span class="nav-arrow">←</span>
+          <span class="nav-text">
+            <span class="nav-sub">पूर्वसर्गः</span>
+            <span id="bottom-prev-label" class="nav-main">Previous Sarga</span>
+          </span>
+        </button>
+
+        <button id="btn-back-to-top" class="btn btn-subtle btn-top" title="Back to top" aria-label="Scroll back to top">
+          ↑ शीर्षम्
+        </button>
+
+        <button id="btn-bottom-next" class="btn btn-nav-bottom" aria-label="Next Sarga">
+          <span class="nav-text">
+            <span class="nav-sub">उत्तरसर्गः</span>
+            <span id="bottom-next-label" class="nav-main">Next Sarga</span>
+          </span>
+          <span class="nav-arrow">→</span>
+        </button>
+      </nav>
+
+    </div>
+  </main>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="toast hidden" role="status" aria-live="polite">
+    <span id="toast-message">श्लोकः प्रतिलिखितः (Verse copied)</span>
+  </div>
+
+  <!-- Info / About Modal -->
+  <div id="info-modal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 id="modal-title">मोक्षोपायशास्त्रम् (Mokṣopāya Shāstra)</h3>
+        <button id="btn-close-modal" class="btn-close" aria-label="Close modal">✕</button>
+      </div>
+      <div class="modal-body">
+        <p>The <strong>Mokṣopāya</strong> (मोक्षोपाय, "The Means to Liberation") is a monumental Sanskrit philosophical masterpiece of Advaita and Kashmir Shaiva non-dual thought, composed in ~30,000 verses across 7 prakaraṇas.</p>
+        
+        <h4>सप्त प्रकरणानि (The 7 Prakaraṇas)</h4>
+        <ol class="prakarana-list">
+          <li><strong>वैराग्यप्रकरणम् (Vairāgya)</strong> — ३२ सर्गाः (1,078 verses)</li>
+          <li><strong>मुमुक्षुव्यवहारप्रकरणम् (Mumukṣuvyavahāra)</strong> — २० सर्गाः (795 verses)</li>
+          <li><strong>उत्पत्तिप्रकरणम् (Utpatti)</strong> — १४० सर्गाः (6,000 verses)</li>
+          <li><strong>स्थितिप्रकरणम् (Sthiti)</strong> — ४४ सर्गाः (1,804 verses)</li>
+          <li><strong>उपशान्तिप्रकरणम् (Upaśānti)</strong> — ९४ सर्गाः (4,299 verses)</li>
+          <li><strong>निर्वाणप्रकरणम् (Nirvāṇa)</strong> — ३७४ सर्गाः (15,330 verses)</li>
+          <li><strong>खिलप्रकरणम् (Khila)</strong> — १४ सर्गाः (602 verses)</li>
+        </ol>
+
+        <h4>कीबोर्ड शॉर्टकट्स (Keyboard Shortcuts)</h4>
+        <ul class="shortcuts-list">
+          <li><kbd>←</kbd> or <kbd>[</kbd> : Previous Sarga</li>
+          <li><kbd>→</kbd> or <kbd>]</kbd> : Next Sarga</li>
+          <li><kbd>f</kbd> or <kbd>/</kbd> : Focus verse filter</li>
+          <li><kbd>t</kbd> : Toggle visual theme</li>
+          <li><kbd>Esc</kbd> : Clear filter / close modal</li>
+        </ul>
+      </div>
+      <div class="modal-footer">
+        <button id="btn-modal-done" class="btn btn-primary">अस्तु (Close)</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
