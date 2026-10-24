@@ -729,7 +729,7 @@ body {
   font-size: var(--verse-font-size);
   line-height: var(--verse-line-height);
   color: var(--text-main);
-  text-align: center;
+  text-align: left;
   letter-spacing: 0.015em;
   padding: 0;
   word-break: break-word;
@@ -737,6 +737,7 @@ body {
 
 .verse-line {
   margin-bottom: 6px;
+  text-align: left;
 }
 
 .verse-line:last-child {
@@ -1091,7 +1092,7 @@ kbd {
   }
 
   .verse-lines {
-    text-align: center;
+    text-align: left;
     padding: 0 4px;
   }
 }
