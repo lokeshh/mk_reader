@@ -9,7 +9,7 @@
   // ---------------------------------------------------------------------------
   // Version (UPDATE VERSION HERE ONLY - Single Source of Truth)
   // ---------------------------------------------------------------------------
-  const APP_VERSION = '1.1.0';
+  const APP_VERSION = '1.1.2';
 
   const PRAKARANA_META = [
     null,
