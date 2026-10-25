@@ -119,8 +119,11 @@
           </div>
         </div>
 
-        <!-- Help / Info Modal Trigger -->
-        <button id="btn-info" class="btn btn-sm btn-icon btn-subtle" title="About Mokṣopāya & Shortcuts" aria-label="App info and shortcuts">ℹ</button>
+        <!-- Help / Info Modal Trigger with Version Display -->
+        <button id="btn-info" class="btn btn-sm btn-subtle btn-info" title="About Mokṣopāya & Shortcuts" aria-label="App info and shortcuts">
+          <span class="info-icon" aria-hidden="true">ℹ</span>
+          <span class="app-version-badge"></span>
+        </button>
       </div>
     </div>
   </header>
@@ -215,8 +218,17 @@
           <li><kbd>t</kbd> : Toggle visual theme</li>
           <li><kbd>Esc</kbd> : Clear filter / close modal</li>
         </ul>
+
+        <div class="cache-control-section" style="margin-top: 16px; padding-top: 14px; border-top: 1px dashed var(--border-subtle); display: flex; justify-content: space-between; align-items: center; gap: 10px;">
+          <div>
+            <div style="font-weight: 600; font-size: 0.88rem;">मूलग्रन्थ-पुनर्भारः (Sacred Text Data)</div>
+            <div style="font-size: 0.75rem; opacity: 0.75;">Auto-updates on changes, or force re-download:</div>
+          </div>
+          <button id="btn-force-reload-data" class="btn btn-sm btn-subtle" style="font-size: 0.78rem; white-space: nowrap;">🔄 Reload Text</button>
+        </div>
       </div>
-      <div class="modal-footer">
+      <div class="modal-footer" style="display: flex; justify-content: space-between; align-items: center;">
+        <span class="app-version-tag" style="font-size: 0.8rem; opacity: 0.7;">आवृत्तिः (<span class="app-version-badge"></span>)</span>
         <button id="btn-modal-done" class="btn btn-primary">अस्तु (Close)</button>
       </div>
     </div>

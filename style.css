@@ -591,6 +591,33 @@ body {
   border: 1px solid var(--border-subtle);
 }
 
+/* Info & Version Button */
+.btn-info {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border: 1px solid var(--border-subtle);
+  padding: 5px 9px;
+  color: var(--text-muted);
+}
+
+.btn-info:hover {
+  color: var(--text-main);
+  border-color: var(--border-accent);
+}
+
+.btn-info .info-icon {
+  font-size: 0.95rem;
+  line-height: 1;
+}
+
+.btn-info .app-version-badge {
+  font-size: 0.74rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  opacity: 0.9;
+}
+
 .theme-menu {
   position: absolute;
   top: calc(100% + 6px);

@@ -7,20 +7,31 @@
   # Overrides old "npm run build" setting in Netlify UI
   command = "echo 'Deploying static SPA...'"
 
-# Cache header for the 7.8MB sacred text file for fast CDN delivery
+# HTML entry points: Always revalidate so browsers immediately receive updates
 [[headers]]
-  for = "/mk_data.txt"
+  for = "/"
   [headers.values]
-    Cache-Control = "public, max-age=31536000, immutable"
-    Content-Type = "text/plain; charset=utf-8"
+    Cache-Control = "public, max-age=0, must-revalidate"
 
-# Cache header for CSS and JS
+[[headers]]
+  for = "/*.html"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+# CSS and JS: Revalidate with Netlify ETags (fast 304 if unchanged, instant download if changed)
 [[headers]]
   for = "/*.css"
   [headers.values]
-    Cache-Control = "public, max-age=86400"
+    Cache-Control = "public, max-age=0, must-revalidate"
 
 [[headers]]
   for = "/*.js"
   [headers.values]
-    Cache-Control = "public, max-age=86400"
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+# Sacred text data: Revalidate with Netlify ETags (fast 304 if unchanged, fresh download if updated)
+[[headers]]
+  for = "/mk_data.txt"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+    Content-Type = "text/plain; charset=utf-8"

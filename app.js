@@ -7,8 +7,10 @@
   'use strict';
 
   // ---------------------------------------------------------------------------
-  // Constants & Metadata
+  // Version (UPDATE VERSION HERE ONLY - Single Source of Truth)
   // ---------------------------------------------------------------------------
+  const APP_VERSION = '1.0.1';
+
   const PRAKARANA_META = [
     null,
     { id: 1, name: 'वैराग्यप्रकरणम्', en: 'Vairāgya (Dispassion)', sargaCount: 32 },
@@ -75,6 +77,18 @@
       store.put(text, DB_KEY);
     } catch (e) {
       console.warn('Could not cache text in IndexedDB:', e);
+    }
+  }
+
+  async function clearCachedText() {
+    try {
+      const db = await openDatabase();
+      const tx = db.transaction(DB_STORE, 'readwrite');
+      const store = tx.objectStore(DB_STORE);
+      store.delete(DB_KEY);
+      localStorage.removeItem('mk_data_fingerprint');
+    } catch (e) {
+      console.warn('Could not clear cached text in IndexedDB:', e);
     }
   }
 
@@ -145,6 +159,11 @@
     el.infoModal = document.getElementById('info-modal');
     el.btnCloseModal = document.getElementById('btn-close-modal');
     el.btnModalDone = document.getElementById('btn-modal-done');
+
+    // Populate version across UI (.app-version-badge in Info button & modal)
+    document.querySelectorAll('.app-version-badge').forEach((badge) => {
+      badge.textContent = `v${APP_VERSION}`;
+    });
   }
 
   // ---------------------------------------------------------------------------
@@ -218,32 +237,85 @@
   // Loader & Initialization
   // ---------------------------------------------------------------------------
   async function loadData() {
-    updateLoader(20, 'Checking local cache...');
+    updateLoader(15, 'Checking local cache...');
 
-    // 1. Try local IndexedDB cache first
+    // 1. Check local IndexedDB cache & stored server fingerprint
     let text = await getCachedText();
-    if (text) {
+    const cachedFingerprint = localStorage.getItem('mk_data_fingerprint');
+    let isCacheValid = false;
+
+    if (text && cachedFingerprint) {
+      updateLoader(25, 'Checking for sacred text updates...');
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 2500);
+
+        // Fast HEAD request to check ETag/Last-Modified without downloading 7.8MB
+        const headResp = await fetch('./mk_data.txt', {
+          method: 'HEAD',
+          cache: 'no-cache',
+          signal: controller.signal
+        });
+        clearTimeout(timeoutId);
+
+        if (headResp.ok) {
+          const remoteFingerprint = headResp.headers.get('ETag') ||
+                                    headResp.headers.get('Last-Modified') ||
+                                    headResp.headers.get('Content-Length');
+
+          if (remoteFingerprint && remoteFingerprint === cachedFingerprint) {
+            isCacheValid = true;
+          } else {
+            console.log('[Mokṣopāya Reader] Fresh version of mk_data.txt detected on server.');
+          }
+        }
+      } catch (err) {
+        // Network timeout / offline / file:// protocol - fall back safely to cached text
+        console.warn('Freshness check skipped (offline or timeout), using cached text:', err);
+        isCacheValid = true;
+      }
+    }
+
+    if (isCacheValid) {
       updateLoader(60, 'Parsing cached मोक्षोपाय text...');
       state.data = parseMokshopayaText(text);
       finishLoading();
       return;
     }
 
-    // 2. Fetch mk_data.txt
-    updateLoader(35, 'Downloading mk_data.txt (7.8 MB)...');
+    // 2. Fetch fresh mk_data.txt if not in cache or if server file has changed
+    const downloadMsg = text ? 'Updating to new mk_data.txt (7.8 MB)...' : 'Downloading mk_data.txt (7.8 MB)...';
+    updateLoader(35, downloadMsg);
     try {
-      const response = await fetch('./mk_data.txt');
+      const response = await fetch('./mk_data.txt', { cache: 'no-cache' });
       if (!response.ok) {
         throw new Error(`HTTP error ${response.status}`);
       }
+
+      const newFingerprint = response.headers.get('ETag') ||
+                             response.headers.get('Last-Modified') ||
+                             response.headers.get('Content-Length');
+
       text = await response.text();
       updateLoader(75, 'Parsing 29,908 verses across 7 प्रकरणानि...');
       state.data = parseMokshopayaText(text);
-      setCachedText(text); // Async save to cache
+
+      await setCachedText(text);
+      if (newFingerprint) {
+        localStorage.setItem('mk_data_fingerprint', newFingerprint);
+      }
+
       finishLoading();
     } catch (err) {
       console.warn('Network fetch failed:', err);
-      // If running under file:// or network failed, offer file picker
+      // If we had old cached text, use it as fallback rather than failing
+      if (text) {
+        updateLoader(75, 'Using cached text fallback...');
+        state.data = parseMokshopayaText(text);
+        finishLoading();
+        return;
+      }
+      // If running under file:// or network failed without cache, offer file picker
       el.loaderStatus.textContent = 'Unable to fetch automatically. Please select mk_data.txt:';
       el.filePickerFallback.classList.remove('hidden');
     }
@@ -934,6 +1006,16 @@
       if (e.target === el.infoModal) el.infoModal.classList.add('hidden');
     });
 
+    const btnForceReload = document.getElementById('btn-force-reload-data');
+    if (btnForceReload) {
+      btnForceReload.addEventListener('click', async () => {
+        btnForceReload.disabled = true;
+        btnForceReload.textContent = 'Clearing...';
+        await clearCachedText();
+        window.location.reload();
+      });
+    }
+
     // Local file fallback picker
     el.localFileInput.addEventListener('change', (e) => {
       const file = e.target.files[0];
@@ -986,6 +1068,7 @@
   // Bootstrap Application
   // ---------------------------------------------------------------------------
   document.addEventListener('DOMContentLoaded', () => {
+    console.log(`[मोक्षोपायशास्त्रम्] Mokṣopāya Reader v${APP_VERSION}`);
     initElements();
 
     // Set saved theme & font size
