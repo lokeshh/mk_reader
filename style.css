@@ -3,11 +3,27 @@
    Curated Sanskrit Aesthetic: Parchment, Cosmic Dark & Sepia Themes
    ========================================================================== */
 
-/* Custom Classical Sanskrit Font */
+/* Custom Classical Sanskrit Fonts */
 @font-face {
   font-family: 'Siddhanta1';
-  src: url('fonts/siddhanta1.ttf') format('truetype');
+  src: url('fonts/siddhanta.ttf') format('truetype');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Shobhika';
+  src: url('fonts/Shobhika-Regular.otf') format('opentype');
   font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Shobhika';
+  src: url('fonts/Shobhika-Bold.otf') format('opentype');
+  font-weight: 700;
   font-style: normal;
   font-display: swap;
 }
@@ -17,8 +33,8 @@
    -------------------------------------------------------------------------- */
 :root {
   /* Fonts */
-  --font-sanskrit: 'Siddhanta1', 'Tiro Devanagari Sanskrit', 'Noto Serif Devanagari', 'Shobhika', serif;
-  --font-heading: 'Cinzel', 'Siddhanta1', 'Noto Serif Devanagari', Georgia, serif;
+  --font-sanskrit: 'Siddhanta1', 'Shobhika', 'Tiro Devanagari Sanskrit', 'Noto Serif Devanagari', serif;
+  --font-heading: 'Siddhanta1', 'Shobhika', 'Cinzel', 'Noto Serif Devanagari', Georgia, serif;
   --font-ui: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 
   /* Sizing */
