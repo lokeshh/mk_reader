@@ -9,7 +9,7 @@
   // ---------------------------------------------------------------------------
   // Version (UPDATE VERSION HERE ONLY - Single Source of Truth)
   // ---------------------------------------------------------------------------
-  const APP_VERSION = '1.0.1';
+  const APP_VERSION = '1.1.0';
 
   const PRAKARANA_META = [
     null,
@@ -233,6 +233,15 @@
     return database;
   }
 
+  function extractFingerprint(response) {
+    if (!response || !response.headers) return null;
+    const etag = response.headers.get('ETag') || '';
+    const lastMod = response.headers.get('Last-Modified') || '';
+    const len = response.headers.get('Content-Length') || '';
+    const fp = `${etag}|${lastMod}|${len}`;
+    return fp !== '||' ? fp : null;
+  }
+
   // ---------------------------------------------------------------------------
   // Loader & Initialization
   // ---------------------------------------------------------------------------
@@ -250,7 +259,7 @@
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 2500);
 
-        // Fast HEAD request to check ETag/Last-Modified without downloading 7.8MB
+        // Fast HEAD request to check ETag / Last-Modified / Length without downloading 7.8MB
         const headResp = await fetch('./mk_data.txt', {
           method: 'HEAD',
           cache: 'no-cache',
@@ -259,14 +268,12 @@
         clearTimeout(timeoutId);
 
         if (headResp.ok) {
-          const remoteFingerprint = headResp.headers.get('ETag') ||
-                                    headResp.headers.get('Last-Modified') ||
-                                    headResp.headers.get('Content-Length');
+          const remoteFingerprint = extractFingerprint(headResp);
 
           if (remoteFingerprint && remoteFingerprint === cachedFingerprint) {
             isCacheValid = true;
           } else {
-            console.log('[Mokṣopāya Reader] Fresh version of mk_data.txt detected on server.');
+            console.log('[Mokṣopāya Reader] Fresh version of mk_data.txt detected on server:', { cached: cachedFingerprint, remote: remoteFingerprint });
           }
         }
       } catch (err) {
@@ -292,9 +299,7 @@
         throw new Error(`HTTP error ${response.status}`);
       }
 
-      const newFingerprint = response.headers.get('ETag') ||
-                             response.headers.get('Last-Modified') ||
-                             response.headers.get('Content-Length');
+      const newFingerprint = extractFingerprint(response);
 
       text = await response.text();
       updateLoader(75, 'Parsing 29,908 verses across 7 प्रकरणानि...');
