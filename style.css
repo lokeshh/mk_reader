@@ -6,7 +6,7 @@
 /* Custom Classical Sanskrit Fonts */
 @font-face {
   font-family: 'Siddhanta1';
-  src: url('fonts/siddhanta.ttf') format('truetype');
+  src: url('fonts/siddhanta.ttf?v=2') format('truetype');
   font-weight: 100 900;
   font-style: normal;
   font-display: swap;
