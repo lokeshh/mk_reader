@@ -9,7 +9,7 @@
   // ---------------------------------------------------------------------------
   // Version (UPDATE VERSION HERE ONLY - Single Source of Truth)
   // ---------------------------------------------------------------------------
-  const APP_VERSION = '1.2.0';
+  const APP_VERSION = '1.2.1';
 
   const PRAKARANA_META = [
     null,
@@ -178,7 +178,7 @@
       database[p] = {};
     }
 
-    const markerRegex = /॥\s*([०-९0-9]+)\.([०-९0-9]+)\.([^\s॥]+)\s*॥$/;
+    const markerRegex = /॥\s*([०-९0-9]+)[.।]([०-९0-9]+)[.।]([^\s॥]+)\s*॥$/;
     let verseLinesBuffer = [];
 
     for (let i = 0; i < lines.length; i++) {
@@ -208,7 +208,7 @@
           // metadata tags (and their leading space) never leak into search or display
           const cleanLines = [...verseLinesBuffer];
           const lastIdx = cleanLines.length - 1;
-          cleanLines[lastIdx] = cleanLines[lastIdx].replace(/\s*॥\s*[०-९0-9]+\.[०-९0-9]+\.[^\s॥]+\s*॥\s*$/, '').trimEnd();
+          cleanLines[lastIdx] = cleanLines[lastIdx].replace(/\s*॥\s*[०-९0-9]+[.।][०-९0-9]+[.।][^\s॥]+\s*॥\s*$/, '').trimEnd();
           const cleanFullText = cleanLines.join('\n');
 
           const verseObj = {
@@ -473,10 +473,7 @@
           const lineDiv = document.createElement('div');
           lineDiv.className = 'verse-line';
 
-          let renderedText = lineText;
-          if (query.length > 0) {
-            renderedText = highlightMatch(renderedText, query);
-          }
+          const renderedText = formatVerseLine(lineText, query);
 
           if (isLastLine) {
             lineDiv.innerHTML = `${renderedText} <span class="verse-num" title="Verse ${verseObj.refDev} (${verseObj.refAscii}) • Click to copy link">॥&nbsp;${verseObj.refDev}&nbsp;॥</span>`;
@@ -630,10 +627,7 @@
         const lineDiv = document.createElement('div');
         lineDiv.className = 'verse-line';
 
-        let renderedText = lineText;
-        if (query.length > 0) {
-          renderedText = highlightMatch(renderedText, query);
-        }
+        const renderedText = formatVerseLine(lineText, query);
 
         if (isLastLine) {
           lineDiv.innerHTML = `${renderedText} <span class="verse-num" title="Verse ${verseObj.refDev} (${verseObj.refAscii}) • Click to copy link">॥&nbsp;${verseObj.refDev}&nbsp;॥</span>`;
@@ -706,6 +700,14 @@
   function markerRegexOnly(v) {
     const escaped = String(v).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     return new RegExp(`\\s*॥\\s*[०-९0-9]+\\.[०-९0-9]+\\.${escaped}\\s*॥\\s*$`);
+  }
+
+  function formatVerseLine(lineText, query) {
+    let rendered = lineText;
+    if (query && query.length > 0) {
+      rendered = highlightMatch(rendered, query);
+    }
+    return rendered.replace(/।/g, '<span class="verse-danda">।</span>');
   }
 
   function highlightMatch(text, query) {

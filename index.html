@@ -87,9 +87,10 @@
         <div class="control-group search-control-group">
           <div class="search-header-row">
             <label for="verse-filter-input" class="control-label">श्लोकशोधनम् (Find)</label>
-            <div class="search-scope-pill" role="group" aria-label="Search Scope">
-              <button type="button" id="scope-sarga-btn" class="scope-btn active" title="Search inside current Sarga">सर्गे</button>
-              <button type="button" id="scope-all-btn" class="scope-btn" title="Search across all 29,908 verses in all 7 Books">समग्रे</button>
+            <div class="search-scope-slider" id="search-scope-slider" role="radiogroup" aria-label="Search Scope" tabindex="0">
+              <div class="scope-slider-thumb" aria-hidden="true"></div>
+              <button type="button" id="scope-sarga-btn" class="scope-btn active" role="radio" aria-checked="true" title="Search inside current Sarga (सर्गे)">सर्गे</button>
+              <button type="button" id="scope-all-btn" class="scope-btn" role="radio" aria-checked="false" title="Search across all 29,908 verses in all 7 Books (समग्रे)">समग्रे</button>
             </div>
           </div>
           <div class="search-input-wrapper">
