@@ -44,7 +44,7 @@
   --radius-md: 10px;
   --radius-lg: 16px;
   --radius-full: 9999px;
-  
+
   /* Reading base sizes (adjustable via UI) */
   --verse-font-size: 1.35rem;
   --verse-line-height: 2.1;
@@ -161,7 +161,9 @@
 /* --------------------------------------------------------------------------
    Reset & Base Styles
    -------------------------------------------------------------------------- */
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
@@ -1209,35 +1211,74 @@ kbd {
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes fadeInDown {
-  from { opacity: 0; transform: translateY(-6px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes slideUpFade {
-  from { opacity: 0; transform: translate(-50%, 12px); }
-  to { opacity: 1; transform: translate(-50%, 0); }
+  from {
+    opacity: 0;
+    transform: translate(-50%, 12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
 }
 
 @keyframes omPulse {
-  0%, 100% { transform: scale(1); opacity: 0.95; }
-  50% { transform: scale(1.08); opacity: 1; text-shadow: 0 0 32px rgba(245, 158, 11, 0.6); }
+
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.95;
+  }
+
+  50% {
+    transform: scale(1.08);
+    opacity: 1;
+    text-shadow: 0 0 32px rgba(245, 158, 11, 0.6);
+  }
 }
 
 @keyframes glowPulse {
-  0% { transform: scale(1.01); box-shadow: 0 0 0 5px var(--primary); }
-  50% { box-shadow: 0 0 0 2px var(--primary); }
-  100% { transform: scale(1); }
+  0% {
+    transform: scale(1.01);
+    box-shadow: 0 0 0 5px var(--primary);
+  }
+
+  50% {
+    box-shadow: 0 0 0 2px var(--primary);
+  }
+
+  100% {
+    transform: scale(1);
+  }
 }
 
 /* --------------------------------------------------------------------------
    Responsive Design
    -------------------------------------------------------------------------- */
 @media (max-width: 860px) {
+
   /* Unstick top panel on mobile: scrolls away naturally */
   .app-header {
     position: static;
