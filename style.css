@@ -896,9 +896,9 @@ body {
   font-weight: 700;
   color: var(--primary);
   cursor: pointer;
-  padding: 1px 6px;
-  border-radius: var(--radius-full);
-  margin-left: 6px;
+  padding: 0;
+  border-radius: var(--radius-sm);
+  margin-left: 0;
   white-space: nowrap;
   display: inline-block;
   vertical-align: baseline;
@@ -1410,8 +1410,8 @@ kbd {
   }
 
   .verse-num {
-    padding: 0 4px;
-    margin-left: 4px;
+    padding: 0;
+    margin-left: 0;
     font-size: 0.5em;
   }
 

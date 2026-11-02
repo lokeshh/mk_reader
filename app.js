@@ -126,6 +126,7 @@
     el.btnNextSargaNav = document.getElementById('btn-next-sarga-nav');
     el.verseFilterInput = document.getElementById('verse-filter-input');
     el.btnClearSearch = document.getElementById('btn-clear-search');
+    el.scopeSlider = document.getElementById('search-scope-slider');
     el.scopeSargaBtn = document.getElementById('scope-sarga-btn');
     el.scopeAllBtn = document.getElementById('scope-all-btn');
 
@@ -476,7 +477,7 @@
           const renderedText = formatVerseLine(lineText, query);
 
           if (isLastLine) {
-            lineDiv.innerHTML = `${renderedText} <span class="verse-num" title="Verse ${verseObj.refDev} (${verseObj.refAscii}) • Click to copy link">॥&nbsp;${verseObj.refDev}&nbsp;॥</span>`;
+            lineDiv.innerHTML = `${renderedText}<span class="verse-num" title="Verse ${verseObj.refDev} (${verseObj.refAscii}) • Click to copy link">॥${verseObj.refDev}॥</span>`;
 
             const numSpan = lineDiv.querySelector('.verse-num');
             if (numSpan) {
@@ -630,7 +631,7 @@
         const renderedText = formatVerseLine(lineText, query);
 
         if (isLastLine) {
-          lineDiv.innerHTML = `${renderedText} <span class="verse-num" title="Verse ${verseObj.refDev} (${verseObj.refAscii}) • Click to copy link">॥&nbsp;${verseObj.refDev}&nbsp;॥</span>`;
+          lineDiv.innerHTML = `${renderedText}<span class="verse-num" title="Verse ${verseObj.refDev} (${verseObj.refAscii}) • Click to copy link">॥${verseObj.refDev}॥</span>`;
 
           const numSpan = lineDiv.querySelector('.verse-num');
           if (numSpan) {
@@ -831,12 +832,26 @@
   function setSearchScope(scope) {
     state.searchScope = scope;
     if (scope === 'all') {
-      if (el.scopeAllBtn) el.scopeAllBtn.classList.add('active');
-      if (el.scopeSargaBtn) el.scopeSargaBtn.classList.remove('active');
+      if (el.scopeSlider) el.scopeSlider.classList.add('scope-all');
+      if (el.scopeAllBtn) {
+        el.scopeAllBtn.classList.add('active');
+        el.scopeAllBtn.setAttribute('aria-checked', 'true');
+      }
+      if (el.scopeSargaBtn) {
+        el.scopeSargaBtn.classList.remove('active');
+        el.scopeSargaBtn.setAttribute('aria-checked', 'false');
+      }
       if (el.verseFilterInput) el.verseFilterInput.placeholder = 'समस्तश्लोकेषु शोधयन्तु (All 29,908 verses)...';
     } else {
-      if (el.scopeSargaBtn) el.scopeSargaBtn.classList.add('active');
-      if (el.scopeAllBtn) el.scopeAllBtn.classList.remove('active');
+      if (el.scopeSlider) el.scopeSlider.classList.remove('scope-all');
+      if (el.scopeSargaBtn) {
+        el.scopeSargaBtn.classList.add('active');
+        el.scopeSargaBtn.setAttribute('aria-checked', 'true');
+      }
+      if (el.scopeAllBtn) {
+        el.scopeAllBtn.classList.remove('active');
+        el.scopeAllBtn.setAttribute('aria-checked', 'false');
+      }
       if (el.verseFilterInput) el.verseFilterInput.placeholder = 'Verse # or word in sarga...';
     }
 
@@ -965,12 +980,60 @@
       }
     });
 
-    // Scope toggle buttons
+    // Scope slider & toggle controls
     if (el.scopeSargaBtn) {
-      el.scopeSargaBtn.addEventListener('click', () => setSearchScope('sarga'));
+      el.scopeSargaBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        setSearchScope('sarga');
+      });
     }
     if (el.scopeAllBtn) {
-      el.scopeAllBtn.addEventListener('click', () => setSearchScope('all'));
+      el.scopeAllBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        setSearchScope('all');
+      });
+    }
+
+    if (el.scopeSlider) {
+      // Toggle on clicking the slider track
+      el.scopeSlider.addEventListener('click', () => {
+        setSearchScope(state.searchScope === 'all' ? 'sarga' : 'all');
+      });
+
+      // Pointer drag/swipe gestures for slider feel
+      let pointerStartX = 0;
+      let isDragging = false;
+      el.scopeSlider.addEventListener('pointerdown', (e) => {
+        pointerStartX = e.clientX;
+        isDragging = true;
+      });
+      el.scopeSlider.addEventListener('pointerup', (e) => {
+        if (!isDragging) return;
+        isDragging = false;
+        const diffX = e.clientX - pointerStartX;
+        if (diffX > 10) {
+          setSearchScope('all');
+        } else if (diffX < -10) {
+          setSearchScope('sarga');
+        }
+      });
+      el.scopeSlider.addEventListener('pointercancel', () => {
+        isDragging = false;
+      });
+
+      // Keyboard navigation
+      el.scopeSlider.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+          e.preventDefault();
+          setSearchScope('all');
+        } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+          e.preventDefault();
+          setSearchScope('sarga');
+        } else if (e.key === ' ' || e.key === 'Enter') {
+          e.preventDefault();
+          setSearchScope(state.searchScope === 'all' ? 'sarga' : 'all');
+        }
+      });
     }
 
     // Scroll to top
